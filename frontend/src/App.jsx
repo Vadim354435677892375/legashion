@@ -1,6 +1,6 @@
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import Intro from './components/Intro';
-import Home from './pages/Home'; // ваша будущая главная страница магазина
+import Home from './pages/glavnaya-stranica'; // главная страница магазина, блоки — в pages/glavnaya-stranica/blocks
 
 export default function App() {
   return (
