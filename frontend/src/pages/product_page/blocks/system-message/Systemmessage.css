@@ -1,0 +1,72 @@
+.sysmsg {
+  width: 100%;
+  max-width: 420px;
+  margin: 32px auto 0;
+  border: 2px solid #0a1f6b;
+  border-radius: 2px;
+  box-shadow: 0 0 0 1px #274fc9 inset, 0 8px 20px rgba(0, 0, 0, 0.4);
+  overflow: hidden;
+}
+
+.sysmsg-titlebar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  padding: 6px 8px;
+  background: linear-gradient(
+    to bottom,
+    #5c9df1 0%,
+    #2e6fe0 18%,
+    #1454cf 45%,
+    #0d3fb0 55%,
+    #123f9e 100%
+  );
+  border-bottom: 1px solid #06225c;
+}
+
+.sysmsg-title {
+  color: #fff;
+  font-family: 'Segoe UI', Tahoma, sans-serif;
+  font-size: 14px;
+  font-weight: 700;
+}
+
+.sysmsg-close {
+  width: 20px;
+  height: 20px;
+  padding: 0;
+  border: 1.5px solid #fff;
+  border-radius: 2px;
+  background: linear-gradient(to bottom, #ff8a80, #d40000);
+  color: #fff;
+  font-size: 15px;
+  line-height: 1;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.sysmsg-body {
+  min-height: 170px;
+  padding: 20px 16px;
+  background: #d5d5d5;
+  color: #1a1a1a;
+  font-family: 'Segoe UI', Tahoma, sans-serif;
+  font-size: 13px;
+  line-height: 1.7;
+}
+
+.sysmsg-reopen {
+  display: block;
+  margin: 32px auto 0;
+  padding: 10px 16px;
+  border: 1px solid #14337a;
+  border-radius: 4px;
+  background: #eef3fb;
+  color: #1a2b52;
+  font-family: 'Segoe UI', Tahoma, sans-serif;
+  font-size: 13px;
+  cursor: pointer;
+}

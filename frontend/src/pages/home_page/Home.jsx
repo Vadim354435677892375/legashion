@@ -1,5 +1,6 @@
 import Player from './blocks/player/Player';
 import Categories from './blocks/collection/CollectionBlock';
+import Products from './blocks/products/Products';
 
 // Главная страница магазина.
 // Каждый визуальный блок из макета Figma живёт в своей папке внутри ./blocks
@@ -16,6 +17,7 @@ export default function GlavnayaStranica() {
     >
       <Player />
       <Categories />
+      <Products />
     </div>
   );
 }

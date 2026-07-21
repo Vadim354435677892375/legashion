@@ -1,0 +1,66 @@
+@import url('https://fonts.googleapis.com/css2?family=Silkscreen:wght@400;700&display=swap');
+
+.products {
+  width: 100%;
+  max-width: 620px;
+  margin: 32px auto 0;
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 16px;
+}
+
+.product-card {
+  display: block;
+  text-decoration: none;
+  border: 2px solid #6b6b6b;
+  border-radius: 2px;
+  overflow: hidden;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.35);
+  transition: transform 0.15s ease, box-shadow 0.15s ease;
+}
+
+.product-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.45);
+}
+
+.product-image {
+  aspect-ratio: 1 / 1;
+  background: #c7c7c7;
+  background-size: cover;
+  background-position: center;
+  border-bottom: 2px solid #6b6b6b;
+}
+
+.product-info {
+  background: #a9a9a9;
+  padding: 8px 6px;
+  text-align: center;
+}
+
+.product-name,
+.product-price {
+  font-family: 'Silkscreen', 'Courier New', monospace;
+  font-size: 11px;
+  letter-spacing: 0.02em;
+  line-height: 1.5;
+}
+
+.product-name {
+  color: #c98a2e;
+}
+
+.product-price {
+  color: #1e6fd9;
+}
+
+@media (max-width: 480px) {
+  .products {
+    max-width: 320px;
+    gap: 10px;
+  }
+  .product-name,
+  .product-price {
+    font-size: 10px;
+  }
+}
