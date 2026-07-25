@@ -1,6 +1,6 @@
 .sysmsg {
   width: 100%;
-  max-width: 420px;
+  max-width: 560px;
   margin: 32px auto 0;
   border: 2px solid #0a1f6b;
   border-radius: 2px;
@@ -13,7 +13,7 @@
   align-items: center;
   justify-content: space-between;
   gap: 8px;
-  padding: 6px 8px;
+  padding: 8px 12px;
   background: linear-gradient(
     to bottom,
     #5c9df1 0%,
@@ -28,19 +28,19 @@
 .sysmsg-title {
   color: #fff;
   font-family: 'Segoe UI', Tahoma, sans-serif;
-  font-size: 14px;
+  font-size: 16px;
   font-weight: 700;
 }
 
 .sysmsg-close {
-  width: 20px;
-  height: 20px;
+  width: 24px;
+  height: 24px;
   padding: 0;
   border: 1.5px solid #fff;
   border-radius: 2px;
   background: linear-gradient(to bottom, #ff8a80, #d40000);
   color: #fff;
-  font-size: 15px;
+  font-size: 17px;
   line-height: 1;
   cursor: pointer;
   display: flex;
@@ -49,24 +49,56 @@
 }
 
 .sysmsg-body {
-  min-height: 170px;
-  padding: 20px 16px;
+  min-height: 200px;
+  padding: 28px 24px;
   background: #d5d5d5;
   color: #1a1a1a;
   font-family: 'Segoe UI', Tahoma, sans-serif;
-  font-size: 13px;
-  line-height: 1.7;
+  font-size: 15px;
+  line-height: 1.9;
 }
 
 .sysmsg-reopen {
-  display: block;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
   margin: 32px auto 0;
-  padding: 10px 16px;
-  border: 1px solid #14337a;
+  padding: 14px 22px;
+  border: 2px solid #0a1f6b;
   border-radius: 4px;
-  background: #eef3fb;
-  color: #1a2b52;
+  background: linear-gradient(
+    to bottom,
+    #5c9df1 0%,
+    #2e6fe0 30%,
+    #1454cf 60%,
+    #0d3fb0 100%
+  );
+  box-shadow: 0 0 0 1px #274fc9 inset, 0 4px 12px rgba(0, 0, 0, 0.4);
+  color: #fff;
   font-family: 'Segoe UI', Tahoma, sans-serif;
-  font-size: 13px;
+  font-size: 14px;
+  font-weight: 700;
+  letter-spacing: 0.02em;
   cursor: pointer;
+  transition: transform 0.15s ease, box-shadow 0.15s ease;
+}
+
+.sysmsg-reopen::before {
+  content: '';
+  width: 14px;
+  height: 14px;
+  border-radius: 2px;
+  background: #fff;
+  box-shadow: inset 0 0 0 2px #1454cf;
+  flex-shrink: 0;
+}
+
+.sysmsg-reopen:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 0 0 1px #274fc9 inset, 0 8px 18px rgba(0, 0, 0, 0.5);
+}
+
+.sysmsg-reopen:active {
+  transform: translateY(0);
 }

@@ -1,3 +1,4 @@
+import { Link } from 'react-router-dom';
 import './Products.css';
 
 // Блок «Товары» — сетка карточек 2 в ряд.
@@ -20,7 +21,7 @@ export default function Products() {
   return (
     <div className="products">
       {PRODUCTS.map(({ name, price, image }, i) => (
-        <a className="product-card" href={`/product/${i}`} key={`${name}-${i}`}>
+        <Link className="product-card" to={`/product/${i}`} key={`${name}-${i}`}>
           <div
             className="product-image"
             style={image ? { backgroundImage: `url(${image})` } : undefined}
@@ -29,7 +30,7 @@ export default function Products() {
             <div className="product-name">{name}</div>
             <div className="product-price">{formatPrice(price)}</div>
           </div>
-        </a>
+        </Link>
       ))}
     </div>
   );
