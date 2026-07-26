@@ -1,0 +1,36 @@
+.paint-window {
+  position: relative;
+  width: 100%;
+  max-width: 700px;
+  margin: 40px auto 0;
+  aspect-ratio: 5766 / 3238;
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.4);
+}
+
+.paint-window-bg {
+  display: block;
+  width: 100%;
+  height: 100%;
+  user-select: none;
+  pointer-events: none;
+}
+
+/* Координаты подобраны под белый холст на скриншоте paint-frame.png */
+.paint-canvas-overlay {
+  position: absolute;
+  left: 9.61%;
+  top: 14.95%;
+  width: 87.11%;
+  height: 69.33%;
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 1.5%;
+  padding: 1%;
+}
+
+.paint-photo {
+  background: #d9d9d9;
+  background-size: cover;
+  background-position: center;
+  border: 1px solid #b3b3b3;
+}

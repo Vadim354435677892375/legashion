@@ -1,6 +1,8 @@
 import Player from './blocks/player/Player';
 import Categories from './blocks/collection/CollectionBlock';
 import Products from './blocks/products/Products';
+import ModelsBlock from './blocks/modelblock/ModelsBlock';
+import InfoBlock from './blocks/info/infoBlock';
 import cartIcon from '../../assets/icons/cart-icon.png';
 
 // Главная страница магазина.
@@ -34,6 +36,8 @@ export default function GlavnayaStranica() {
       <Player />
       <Categories />
       <Products />
+      <ModelsBlock />
+      <InfoBlock />
     </div>
   );
 }
