@@ -175,10 +175,6 @@ export default function CheckoutPage() {
           </button>
         </div>
       </form>
-
-      <Link className="checkout-to-cart" to="/cart">
-        ← в корзину
-      </Link>
     </div>
   );
 }
