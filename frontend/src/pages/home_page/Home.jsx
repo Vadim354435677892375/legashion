@@ -1,8 +1,9 @@
+import { Link } from 'react-router-dom';
 import Player from './blocks/player/Player';
 import Categories from './blocks/collection/CollectionBlock';
 import Products from './blocks/products/Products';
 import ModelsBlock from './blocks/modelblock/ModelsBlock';
-import InfoBlock from './blocks/info/infoBlock';
+import InfoBlock from './blocks/info/InfoBlock';
 import cartIcon from '../../assets/icons/cart-icon.png';
 
 // Главная страница магазина.
@@ -19,20 +20,26 @@ export default function GlavnayaStranica() {
       }}
     >
       {/* Значок корзины в левом верхнем углу. position: fixed — остаётся на месте при прокрутке */}
-      <img
-        src={cartIcon}
-        alt="Корзина"
+      <Link
+        to="/cart"
         style={{
           position: 'fixed',
           bottom: '20px',
           right: '100px',
-          width: '60px',
-          height: 'auto',
           zIndex: 1000,
-          cursor: 'pointer',
-          filter: 'drop-shadow(0 2px 6px rgba(0, 0, 0, 0.35))',
         }}
-      />
+      >
+        <img
+          src={cartIcon}
+          alt="Корзина"
+          style={{
+            width: '60px',
+            height: 'auto',
+            cursor: 'pointer',
+            filter: 'drop-shadow(0 2px 6px rgba(0, 0, 0, 0.35))',
+          }}
+        />
+      </Link>
       <Player />
       <Categories />
       <Products />

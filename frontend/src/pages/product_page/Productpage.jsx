@@ -1,5 +1,6 @@
 import { useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useParams } from 'react-router-dom';
+import { useCart } from '../../context/CartContext';
 import './ProductPage.css';
 import Gallery from './blocks/gallery/Gallery';
 import SystemMessage from './blocks/system-message/SystemMessage';
@@ -8,7 +9,11 @@ import OrderBlock from './blocks/order/OrderBlock';
 // Страница «Карточка товара».
 // images: пути к фото товара для галереи (сейчас — плейсхолдеры, [] пока фото нет).
 // details: текст для окна System message (плотность, состав ткани и т.п.)
+// name/price: пока заглушки — когда появится каталог с реальными товарами,
+// брать их нужно будет по :id из данных товара, а не из константы.
 const PRODUCT = {
+  name: 'Товар',
+  price: 3000,
   images: [],
   details: {
     density: '—',
@@ -17,9 +22,20 @@ const PRODUCT = {
 };
 
 export default function ProductPage() {
+  const { id } = useParams();
+  const { addItem } = useCart();
   const [cartCount, setCartCount] = useState(0);
 
-  const handleAddToCart = () => setCartCount((c) => c + 1);
+  const handleAddToCart = (size) => {
+    setCartCount((c) => c + 1);
+    addItem({
+      id: `${id ?? PRODUCT.name}-${size}`,
+      name: PRODUCT.name,
+      size,
+      price: PRODUCT.price,
+      qty: 1,
+    });
+  };
 
   return (
     <div className="product-page">

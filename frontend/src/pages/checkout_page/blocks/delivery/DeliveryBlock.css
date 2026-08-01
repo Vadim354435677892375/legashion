@@ -1,0 +1,24 @@
+.delivery-options {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.delivery-option {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-family: 'Segoe UI', Tahoma, sans-serif;
+  font-size: 15px;
+  font-weight: 600;
+  color: #1a1a1a;
+  text-transform: uppercase;
+  cursor: pointer;
+}
+
+.delivery-option input[type='radio'] {
+  width: 18px;
+  height: 18px;
+  accent-color: #163a7a;
+  cursor: pointer;
+}

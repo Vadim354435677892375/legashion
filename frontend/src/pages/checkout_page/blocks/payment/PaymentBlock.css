@@ -1,0 +1,60 @@
+.payment-options {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  margin-bottom: 24px;
+}
+
+.payment-option {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-family: 'Segoe UI', Tahoma, sans-serif;
+  font-size: 15px;
+  font-weight: 600;
+  color: #1a1a1a;
+  text-transform: uppercase;
+  cursor: pointer;
+}
+
+.payment-option input[type='radio'] {
+  width: 18px;
+  height: 18px;
+  accent-color: #163a7a;
+  cursor: pointer;
+}
+
+.payment-agreements {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.payment-agreement {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  font-family: 'Segoe UI', Tahoma, sans-serif;
+  font-size: 12px;
+  color: #3a3a3a;
+  cursor: pointer;
+}
+
+.payment-agreement input[type='checkbox'] {
+  margin-top: 2px;
+  width: 15px;
+  height: 15px;
+  accent-color: #163a7a;
+  cursor: pointer;
+  flex-shrink: 0;
+}
+
+.payment-agreement a {
+  color: #163a7a;
+}
+
+.payment-error {
+  font-family: 'Segoe UI', Tahoma, sans-serif;
+  font-size: 12px;
+  color: #7a1a1a;
+}

@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import './infoBlock.css';
+import './InfoBlock.css';
 import docStackIcon from '../../../../assets/doc-stack-icon.png';
 import truckGlyph from '../../../../assets/icons/glyph-truck.png';
 import runnerGlyph from '../../../../assets/icons/glyph-runner.png';

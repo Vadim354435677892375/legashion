@@ -1,0 +1,50 @@
+.phone-field-row {
+  display: flex;
+  gap: 10px;
+}
+
+.phone-code-select {
+  flex: 0 0 90px;
+}
+
+.phone-code-input {
+  width: 100%;
+  text-align: center;
+  cursor: pointer;
+}
+
+.phone-number-input {
+  flex: 1;
+  min-width: 0;
+}
+
+.phone-code-list {
+  width: 220px;
+}
+
+.phone-code-list .address-autocomplete-item {
+  display: flex;
+  align-items: baseline;
+  gap: 10px;
+}
+
+.phone-code-item-code {
+  flex: 0 0 auto;
+  font-weight: 700;
+  color: #163a7a;
+}
+
+.phone-code-item-name {
+  font-weight: 500;
+  font-size: 13px;
+  color: #1a1a1a;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.phone-field-hint {
+  font-family: 'Segoe UI', Tahoma, sans-serif;
+  font-size: 12px;
+  color: #4a4a4a;
+}
