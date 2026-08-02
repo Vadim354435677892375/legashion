@@ -1,6 +1,6 @@
 import { Link, useParams } from 'react-router-dom';
+import { useCart } from '../../context/CartContext';
 import './CollectionPage.css';
-import logo from '../../assets/logo-glitch.gif';
 import cartIcon from '../../assets/icons/cart-icon.png';
 
 // Страница отдельной коллекции (открывается по клику на карточку в блоке
@@ -27,53 +27,62 @@ function formatPrice(value) {
 
 export default function CollectionPage() {
   const { slug } = useParams();
+  const { totalCount } = useCart();
   const collection = COLLECTIONS[slug] ?? COLLECTIONS['new-collection'];
 
   return (
     <div className="collection-page">
-      <div className="collection-frame">
-        <header className="collection-header">
-          <div className="collection-logo">
-            <img src={logo} alt="LEGASHION" />
-          </div>
-          <h1 className="collection-title">{collection.title}</h1>
-        </header>
+      <Link className="collection-back-top" to="/home">
+        ← назад
+      </Link>
 
-        <div className="collection-divider" />
+      <h1 className="collection-title">{collection.title}</h1>
 
-        <div className="collection-banner">
-          <span className="collection-photo collection-photo--top" />
-          <span className="collection-photo collection-photo--bottom" />
-        </div>
+      <div className="collection-banner" />
 
-        <div className="collection-divider" />
-
-        <div className="collection-grid">
-          {collection.items.map(({ name, price, image }, i) => (
-            <Link
-              className="collection-card"
-              to={`/product/${slug}-${i}`}
-              key={`${name}-${i}`}
-            >
-              <div
-                className="collection-card-image"
-                style={image ? { backgroundImage: `url(${image})` } : undefined}
-              />
-              <div className="collection-card-info">
-                <div className="collection-card-name">{name}</div>
-                <div className="collection-card-price">{formatPrice(price)}</div>
-              </div>
-            </Link>
-          ))}
-        </div>
-
-        <Link className="collection-back" to="/home">
-          вернуться на главную
-        </Link>
+      <div className="collection-grid">
+        {collection.items.map(({ name, price, image }, i) => (
+          <Link
+            className="collection-card"
+            to={`/product/${slug}-${i}`}
+            key={`${name}-${i}`}
+          >
+            <div
+              className="collection-card-image"
+              style={image ? { backgroundImage: `url(${image})` } : undefined}
+            />
+            <div className="collection-card-info">
+              <div className="collection-card-name">{name}</div>
+              <div className="collection-card-price">{formatPrice(price)}</div>
+            </div>
+          </Link>
+        ))}
       </div>
 
-      <Link to="/cart" className="collection-cart-icon">
-        <img src={cartIcon} alt="Корзина" />
+      <Link className="collection-back" to="/home">
+        вернуться на главную
+      </Link>
+
+      <Link
+        to="/cart"
+        style={{
+          position: 'fixed',
+          bottom: '20px',
+          right: '100px',
+          zIndex: 1000,
+        }}
+      >
+        <img
+          src={cartIcon}
+          alt="Корзина"
+          style={{
+            width: '60px',
+            height: 'auto',
+            cursor: 'pointer',
+            filter: 'drop-shadow(0 2px 6px rgba(0, 0, 0, 0.35))',
+          }}
+        />
+        {totalCount > 0 && <span className="collection-cart-count">{totalCount}</span>}
       </Link>
     </div>
   );
