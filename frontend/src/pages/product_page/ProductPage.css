@@ -37,6 +37,10 @@
   font-size: 15px;
   font-weight: 600;
   text-decoration: none;
+  background: none;
+  border: none;
+  padding: 0;
+  cursor: pointer;
 }
 
 .product-back:hover {

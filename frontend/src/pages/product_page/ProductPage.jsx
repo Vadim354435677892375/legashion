@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Link, useParams } from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router-dom';
 import { useCart } from '../../context/CartContext';
 import './ProductPage.css';
 import Gallery from './blocks/gallery/Gallery';
@@ -25,6 +25,18 @@ export default function ProductPage() {
   const { id } = useParams();
   const { addItem } = useCart();
   const [cartCount, setCartCount] = useState(0);
+  const navigate = useNavigate();
+
+  // Возвращаемся туда, откуда пришли (главная, страница коллекции и т.д.),
+  // а не всегда на /home. Если истории нет (открыли ссылку напрямую) —
+  // всё равно уводим на главную, чтобы не остаться на пустом экране.
+  const goBack = () => {
+    if (window.history.length > 1) {
+      navigate(-1);
+    } else {
+      navigate('/home');
+    }
+  };
 
   const handleAddToCart = (size) => {
     setCartCount((c) => c + 1);
@@ -39,9 +51,9 @@ export default function ProductPage() {
 
   return (
     <div className="product-page">
-      <Link className="product-back" to="/home">
+      <button type="button" className="product-back" onClick={goBack}>
         ← назад
-      </Link>
+      </button>
 
       <div className="product-cart-indicator">
         <span>в корзину</span>
