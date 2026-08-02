@@ -20,9 +20,34 @@
   text-decoration: underline;
 }
 
-.collection-title {
+.collection-header {
+  width: 100%;
   max-width: 620px;
   margin: 0 auto 20px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 16px;
+}
+
+.collection-logo {
+  width: 52px;
+  height: 52px;
+  flex-shrink: 0;
+  border-radius: 6px;
+  overflow: hidden;
+  border: 2px solid #1a1a1a;
+  background: #000;
+  box-shadow: 0 3px 8px rgba(0, 0, 0, 0.35);
+}
+
+.collection-logo img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.collection-title {
   text-align: center;
   font-family: 'Times New Roman', Georgia, serif;
   font-size: 26px;
@@ -31,20 +56,91 @@
   color: #1a1a1a;
 }
 
+/* Бегущая строка по чёрной полосе */
+.marquee-bar {
+  width: 100%;
+  max-width: 620px;
+  margin: 0 auto;
+  height: 30px;
+  background: #1a1a1a;
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+}
+
+.marquee-track {
+  display: flex;
+  align-items: center;
+  gap: 48px;
+  padding-left: 48px;
+  white-space: nowrap;
+  animation: marquee-scroll 14s linear infinite;
+}
+
+.marquee-track span {
+  font-family: 'Silkscreen', 'Courier New', monospace;
+  font-size: 12px;
+  letter-spacing: 0.12em;
+  color: #fff;
+  text-transform: uppercase;
+}
+
+@keyframes marquee-scroll {
+  from {
+    transform: translateX(0);
+  }
+  to {
+    transform: translateX(-50%);
+  }
+}
+
 .collection-banner {
   width: 100%;
   max-width: 620px;
-  height: 90px;
-  margin: 0 auto 32px;
+  min-height: 320px;
+  margin: 0 auto;
   background: #d8d8d8;
-  border-top: 8px solid #1a1a1a;
-  border-bottom: 8px solid #1a1a1a;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.collection-banner-placeholder {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 14px;
+}
+
+.collection-banner-play {
+  width: 56px;
+  height: 56px;
+  border-radius: 50%;
+  background: rgba(26, 26, 26, 0.85);
+  position: relative;
+}
+
+.collection-banner-play::after {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 54%;
+  transform: translate(-50%, -50%);
+  border-style: solid;
+  border-width: 10px 0 10px 16px;
+  border-color: transparent transparent transparent #fff;
+}
+
+.collection-banner-text {
+  font-family: 'Segoe UI', Tahoma, sans-serif;
+  font-size: 13px;
+  color: #555;
 }
 
 .collection-grid {
   width: 100%;
   max-width: 620px;
-  margin: 0 auto;
+  margin: 32px auto 0;
   display: grid;
   grid-template-columns: repeat(2, 1fr);
   gap: 16px;
@@ -126,13 +222,14 @@
 }
 
 @media (max-width: 480px) {
-  .collection-grid {
-    max-width: 320px;
-    gap: 10px;
-  }
+  .collection-grid,
   .collection-banner,
-  .collection-title {
+  .collection-header,
+  .marquee-bar {
     max-width: 320px;
+  }
+  .collection-banner {
+    min-height: 220px;
   }
   .collection-card-name,
   .collection-card-price {

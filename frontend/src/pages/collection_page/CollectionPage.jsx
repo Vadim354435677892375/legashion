@@ -1,6 +1,7 @@
 import { Link, useParams } from 'react-router-dom';
 import { useCart } from '../../context/CartContext';
 import './CollectionPage.css';
+import logo from '../../assets/logo-glitch.gif';
 import cartIcon from '../../assets/icons/cart-icon.png';
 
 // Страница отдельной коллекции (открывается по клику на карточку в блоке
@@ -12,6 +13,7 @@ import cartIcon from '../../assets/icons/cart-icon.png';
 const COLLECTIONS = {
   'new-collection': {
     title: 'NEW COLLECTION',
+    marquee: 'NEW COLLECTION',
     items: [
       { name: 'T-shirt "Eminem"', price: 1800, image: null },
       { name: 'T-shirt "Eminem"', price: 1800, image: null },
@@ -25,6 +27,21 @@ function formatPrice(value) {
   return `${value.toLocaleString('ru-RU')} \u20BD`;
 }
 
+// Бегущая строка по чёрной полосе. Текст повторяется несколько раз внутри
+// одного трека — так при бесконечной прокрутке на 50% ширины не видно шва.
+function MarqueeBar({ text }) {
+  const items = Array.from({ length: 8 }, (_, i) => i);
+  return (
+    <div className="marquee-bar">
+      <div className="marquee-track">
+        {items.map((i) => (
+          <span key={i}>{text}</span>
+        ))}
+      </div>
+    </div>
+  );
+}
+
 export default function CollectionPage() {
   const { slug } = useParams();
   const { totalCount } = useCart();
@@ -36,9 +53,23 @@ export default function CollectionPage() {
         ← назад
       </Link>
 
-      <h1 className="collection-title">{collection.title}</h1>
+      <header className="collection-header">
+        <div className="collection-logo">
+          <img src={logo} alt="LEGASHION" />
+        </div>
+        <h1 className="collection-title">{collection.title}</h1>
+      </header>
 
-      <div className="collection-banner" />
+      <MarqueeBar text={collection.marquee} />
+
+      <div className="collection-banner">
+        <div className="collection-banner-placeholder">
+          <span className="collection-banner-play" />
+          <span className="collection-banner-text">Промо-видео коллекции скоро</span>
+        </div>
+      </div>
+
+      <MarqueeBar text={collection.marquee} />
 
       <div className="collection-grid">
         {collection.items.map(({ name, price, image }, i) => (
