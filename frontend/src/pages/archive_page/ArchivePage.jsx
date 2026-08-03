@@ -26,21 +26,6 @@ function formatPrice(value) {
   return `${value.toLocaleString('ru-RU')} \u20BD`;
 }
 
-// Бегущая строка по чёрной полосе. Текст повторяется несколько раз внутри
-// одного трека — так при бесконечной прокрутке на 50% ширины не видно шва.
-function MarqueeBar({ text }) {
-  const items = Array.from({ length: 8 }, (_, i) => i);
-  return (
-    <div className="archive-marquee-bar">
-      <div className="archive-marquee-track">
-        {items.map((i) => (
-          <span key={i}>{text}</span>
-        ))}
-      </div>
-    </div>
-  );
-}
-
 // Баннер-карусель: стрелки листают слайды, точки под баннером показывают
 // текущий слайд и позволяют перейти напрямую. Фото пока нет — вместо них
 // пустые серые плейсхолдеры.
@@ -114,11 +99,7 @@ export default function ArchivePage() {
         <h1 className="archive-title">ARCHIVE</h1>
       </header>
 
-      <MarqueeBar text="ARCHIVE" />
-
       <BannerCarousel slideCount={BANNER_SLIDE_COUNT} />
-
-      <MarqueeBar text="ARCHIVE" />
 
       <div className="archive-grid">
         {ITEMS.map(({ name, price, image }, i) => (

@@ -56,50 +56,12 @@
   color: #1a1a1a;
 }
 
-/* Бегущая строка по чёрной полосе */
-.archive-marquee-bar {
-  width: 100%;
-  max-width: 620px;
-  margin: 0 auto;
-  height: 30px;
-  background: #1a1a1a;
-  overflow: hidden;
-  display: flex;
-  align-items: center;
-}
-
-.archive-marquee-track {
-  display: flex;
-  align-items: center;
-  gap: 48px;
-  padding-left: 48px;
-  white-space: nowrap;
-  animation: archive-marquee-scroll 14s linear infinite;
-}
-
-.archive-marquee-track span {
-  font-family: 'Silkscreen', 'Courier New', monospace;
-  font-size: 12px;
-  letter-spacing: 0.12em;
-  color: #fff;
-  text-transform: uppercase;
-}
-
-@keyframes archive-marquee-scroll {
-  from {
-    transform: translateX(0);
-  }
-  to {
-    transform: translateX(-50%);
-  }
-}
-
 .archive-banner {
   position: relative;
   width: 100%;
   max-width: 620px;
   min-height: 320px;
-  margin: 0 auto;
+  margin: 8px auto 0;
   background: #d8d8d8;
   overflow: hidden;
   display: flex;
@@ -272,8 +234,7 @@
   .archive-grid,
   .archive-banner,
   .archive-carousel-dots,
-  .archive-header,
-  .archive-marquee-bar {
+  .archive-header {
     max-width: 320px;
   }
   .archive-banner,
