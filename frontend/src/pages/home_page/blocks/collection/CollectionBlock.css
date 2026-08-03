@@ -2,17 +2,61 @@
   width: 100%;
   max-width: 900px;
   margin: 32px auto 0;
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.categories-track {
+  flex: 1;
+  display: flex;
   gap: 20px;
+  overflow-x: auto;
+  scroll-snap-type: x mandatory;
+  scroll-behavior: smooth;
+  padding: 4px 2px;
+  /* прячем нативный скроллбар — листаем стрелками или свайпом/трекпадом */
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+
+.categories-track::-webkit-scrollbar {
+  display: none;
 }
 
 .categories-card {
+  flex: 0 0 calc((100% - 2 * 20px) / 3);
+  scroll-snap-align: start;
   display: flex;
   flex-direction: column;
   gap: 14px;
   text-decoration: none;
   cursor: pointer;
+}
+
+.categories-arrow {
+  flex: 0 0 auto;
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  border: 2px solid #0a0a0a;
+  background: linear-gradient(to bottom, #e9e9e9, #c9c9c9);
+  color: #163a7a;
+  font-size: 15px;
+  font-weight: 700;
+  line-height: 1;
+  cursor: pointer;
+  box-shadow: 0 3px 8px rgba(0, 0, 0, 0.35);
+  transition: transform 0.15s ease, box-shadow 0.15s ease;
+}
+
+.categories-arrow:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 14px rgba(0, 0, 0, 0.45);
+}
+
+.categories-arrow:active {
+  transform: translateY(0);
 }
 
 .categories-image {
@@ -50,7 +94,10 @@
 
 @media (max-width: 640px) {
   .categories {
-    grid-template-columns: 1fr;
     max-width: 340px;
+  }
+
+  .categories-card {
+    flex: 0 0 100%;
   }
 }

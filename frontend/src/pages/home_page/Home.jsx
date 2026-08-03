@@ -1,4 +1,5 @@
 import { Link } from 'react-router-dom';
+import { useCart } from '../../context/CartContext';
 import Player from './blocks/player/Player';
 import Categories from './blocks/collection/CollectionBlock';
 import Products from './blocks/products/Products';
@@ -10,6 +11,8 @@ import cartIcon from '../../assets/icons/cart-icon.png';
 // Каждый визуальный блок из макета Figma живёт в своей папке внутри ./blocks
 // и подключается сюда по мере готовности.
 export default function GlavnayaStranica() {
+  const { totalCount } = useCart();
+
   return (
     <div
       style={{
@@ -39,6 +42,28 @@ export default function GlavnayaStranica() {
             filter: 'drop-shadow(0 2px 6px rgba(0, 0, 0, 0.35))',
           }}
         />
+        {totalCount > 0 && (
+          <span
+            style={{
+              position: 'absolute',
+              top: '-6px',
+              right: '-6px',
+              display: 'inline-flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              minWidth: '20px',
+              height: '20px',
+              padding: '0 5px',
+              borderRadius: '50%',
+              background: '#163a7a',
+              color: '#fff',
+              fontSize: '12px',
+              fontWeight: 700,
+            }}
+          >
+            {totalCount}
+          </span>
+        )}
       </Link>
       <Player />
       <Categories />
@@ -47,4 +72,4 @@ export default function GlavnayaStranica() {
       <InfoBlock />
     </div>
   );
-}
+}к
