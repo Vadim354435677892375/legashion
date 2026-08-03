@@ -72,4 +72,4 @@ export default function GlavnayaStranica() {
       <InfoBlock />
     </div>
   );
-}к
+}
