@@ -95,46 +95,93 @@
 }
 
 .archive-banner {
+  position: relative;
   width: 100%;
   max-width: 620px;
   min-height: 320px;
   margin: 0 auto;
   background: #d8d8d8;
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+}
+
+.archive-carousel-viewport {
+  position: relative;
+  width: 100%;
+  height: 320px;
+  overflow: hidden;
+}
+
+.archive-carousel-slide {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(155deg, #dcdcdc 0%, #c9c9c9 100%);
+  transition: transform 0.35s ease;
+}
+
+.archive-carousel-arrow {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  z-index: 2;
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  border: none;
+  background: rgba(120, 120, 120, 0.85);
+  color: #fff;
+  font-size: 15px;
+  font-weight: 700;
+  line-height: 1;
+  cursor: pointer;
+  box-shadow: 0 3px 8px rgba(0, 0, 0, 0.35);
+  transition: background 0.15s ease, transform 0.15s ease;
+}
+
+.archive-carousel-arrow:hover {
+  background: rgba(90, 90, 90, 0.95);
+}
+
+.archive-carousel-arrow--left {
+  left: 16px;
+}
+
+.archive-carousel-arrow--right {
+  right: 16px;
+}
+
+.archive-carousel-dots {
+  width: 100%;
+  max-width: 620px;
+  margin: 0 auto;
+  padding: 14px 0;
+  background: #d8d8d8;
   display: flex;
   align-items: center;
   justify-content: center;
+  gap: 10px;
 }
 
-.archive-banner-placeholder {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 14px;
-}
-
-.archive-banner-play {
-  width: 56px;
-  height: 56px;
+.archive-carousel-dot {
+  width: 8px;
+  height: 8px;
   border-radius: 50%;
-  background: rgba(26, 26, 26, 0.85);
-  position: relative;
+  border: none;
+  padding: 0;
+  background: #fff;
+  opacity: 0.7;
+  cursor: pointer;
+  transition: opacity 0.15s ease, transform 0.15s ease;
 }
 
-.archive-banner-play::after {
-  content: '';
-  position: absolute;
-  top: 50%;
-  left: 54%;
-  transform: translate(-50%, -50%);
-  border-style: solid;
-  border-width: 10px 0 10px 16px;
-  border-color: transparent transparent transparent #fff;
+.archive-carousel-dot:hover {
+  opacity: 1;
 }
 
-.archive-banner-text {
-  font-family: 'Segoe UI', Tahoma, sans-serif;
-  font-size: 13px;
-  color: #555;
+.archive-carousel-dot.active {
+  opacity: 1;
+  transform: scale(1.2);
 }
 
 .archive-grid {
@@ -224,12 +271,15 @@
 @media (max-width: 480px) {
   .archive-grid,
   .archive-banner,
+  .archive-carousel-dots,
   .archive-header,
   .archive-marquee-bar {
     max-width: 320px;
   }
-  .archive-banner {
+  .archive-banner,
+  .archive-carousel-viewport {
     min-height: 220px;
+    height: 220px;
   }
   .archive-card-name,
   .archive-card-price {

@@ -1,3 +1,4 @@
+import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { useCart } from '../../context/CartContext';
 import './ArchivePage.css';
@@ -16,6 +17,11 @@ const ITEMS = [
   { name: 'T-shirt "Eminem"', price: 1800, image: null },
 ];
 
+// Число слайдов в баннере-карусели. Пока фото нет — слайды пустые серые
+// плейсхолдеры; когда появятся фото архива, сюда нужно будет передать
+// реальный список image-путей вместо slideCount.
+const BANNER_SLIDE_COUNT = 4;
+
 function formatPrice(value) {
   return `${value.toLocaleString('ru-RU')} \u20BD`;
 }
@@ -32,6 +38,63 @@ function MarqueeBar({ text }) {
         ))}
       </div>
     </div>
+  );
+}
+
+// Баннер-карусель: стрелки листают слайды, точки под баннером показывают
+// текущий слайд и позволяют перейти напрямую. Фото пока нет — вместо них
+// пустые серые плейсхолдеры.
+function BannerCarousel({ slideCount }) {
+  const [index, setIndex] = useState(0);
+  const slides = Array.from({ length: slideCount }, (_, i) => i);
+
+  const prev = () => setIndex((i) => (i - 1 + slideCount) % slideCount);
+  const next = () => setIndex((i) => (i + 1) % slideCount);
+
+  return (
+    <>
+      <div className="archive-banner">
+        <button
+          type="button"
+          className="archive-carousel-arrow archive-carousel-arrow--left"
+          aria-label="Предыдущее фото"
+          onClick={prev}
+        >
+          ←
+        </button>
+
+        <div className="archive-carousel-viewport">
+          {slides.map((i) => (
+            <div
+              key={i}
+              className="archive-carousel-slide"
+              style={{ transform: `translateX(${(i - index) * 100}%)` }}
+            />
+          ))}
+        </div>
+
+        <button
+          type="button"
+          className="archive-carousel-arrow archive-carousel-arrow--right"
+          aria-label="Следующее фото"
+          onClick={next}
+        >
+          →
+        </button>
+      </div>
+
+      <div className="archive-carousel-dots">
+        {slides.map((i) => (
+          <button
+            key={i}
+            type="button"
+            className={`archive-carousel-dot${i === index ? ' active' : ''}`}
+            aria-label={`Слайд ${i + 1}`}
+            onClick={() => setIndex(i)}
+          />
+        ))}
+      </div>
+    </>
   );
 }
 
@@ -53,12 +116,7 @@ export default function ArchivePage() {
 
       <MarqueeBar text="ARCHIVE" />
 
-      <div className="archive-banner">
-        <div className="archive-banner-placeholder">
-          <span className="archive-banner-play" />
-          <span className="archive-banner-text">Промо-видео коллекции скоро</span>
-        </div>
-      </div>
+      <BannerCarousel slideCount={BANNER_SLIDE_COUNT} />
 
       <MarqueeBar text="ARCHIVE" />
 
