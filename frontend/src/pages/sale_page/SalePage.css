@@ -16,7 +16,18 @@
     #f4c400 0 26px,
     #111111 26px 52px
   );
+  background-size: 200% 200%;
   box-shadow: 0 3px 8px rgba(0, 0, 0, 0.35);
+  animation: sale-tape-move 2.5s linear infinite;
+}
+
+@keyframes sale-tape-move {
+  from {
+    background-position: 0 0;
+  }
+  to {
+    background-position: 100% 100%;
+  }
 }
 
 .sale-back-top {
