@@ -7,6 +7,7 @@ import CartPage from './pages/cart_page/CartPage'; // корзина, блоки
 import CheckoutPage from './pages/checkout_page/CheckoutPage'; // оформление заказа, блоки — в pages/checkout_page/blocks
 import CollectionPage from './pages/collection_page/CollectionPage'; // страница коллекции (New Collection / Sale)
 import ArchivePage from './pages/archive_page/ArchivePage'; // отдельная страница коллекции Archive
+import SalePage from './pages/sale_page/SalePage'; // отдельная страница коллекции Sale
 
 export default function App() {
   return (
@@ -18,6 +19,7 @@ export default function App() {
           <Route path="/product/:id" element={<ProductPage />} />
           <Route path="/collection/:slug" element={<CollectionPage />} />
           <Route path="/archive" element={<ArchivePage />} />
+          <Route path="/sale" element={<SalePage />} />
           <Route path="/cart" element={<CartPage />} />
           <Route path="/checkout" element={<CheckoutPage />} />
         </Routes>

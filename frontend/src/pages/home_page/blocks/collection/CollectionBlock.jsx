@@ -14,7 +14,7 @@ import './CollectionBlock.css';
 const CATEGORIES = [
   { label: 'New Collection', image: null, slug: 'new-collection' },
   { label: 'Archive', image: null, to: '/archive' },
-  { label: 'Sale', image: null, slug: null },
+  { label: 'Sale', image: null, to: '/sale' },
   { label: 'Лонгсливы', image: null, slug: null },
   { label: 'Футболки', image: null, slug: null },
 ];
