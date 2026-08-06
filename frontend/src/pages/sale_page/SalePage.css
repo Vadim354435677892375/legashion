@@ -5,12 +5,18 @@
   padding: 0 20px 80px;
   color: #fff;
   font-family: 'Segoe UI', Tahoma, sans-serif;
+  overflow-x: hidden;
 }
 
 .sale-tape {
-  width: 100%;
+  width: 100vw;
+  position: relative;
+  left: 50%;
+  right: 50%;
+  margin-left: -50vw;
+  margin-right: -50vw;
   height: 34px;
-  margin: 0 -20px 20px;
+  margin-bottom: 20px;
   background: repeating-linear-gradient(
     -45deg,
     #f4c400 0 26px,
@@ -18,7 +24,7 @@
   );
   background-size: 200% 200%;
   box-shadow: 0 3px 8px rgba(0, 0, 0, 0.35);
-  animation: sale-tape-move 2.5s linear infinite;
+  animation: sale-tape-move 8s linear infinite;
 }
 
 @keyframes sale-tape-move {
