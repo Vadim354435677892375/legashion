@@ -22,24 +22,14 @@
 
 .tshirts-hero {
   width: 130px;
-  aspect-ratio: 3 / 4;
-  margin: 0 auto;
+  aspect-ratio: 1 / 1;
+  margin: 0 auto 24px;
   background: #c7c7c7 linear-gradient(155deg, #dcdcdc 0%, #c0c0c0 100%);
   background-size: cover;
   background-position: center;
   border: 2px solid #6b6b6b;
   border-radius: 2px;
   box-shadow: 0 4px 10px rgba(0, 0, 0, 0.35);
-}
-
-.tshirts-title {
-  margin: 16px 0 20px;
-  text-align: center;
-  font-family: 'Times New Roman', Georgia, serif;
-  font-size: 26px;
-  font-weight: 700;
-  letter-spacing: 0.08em;
-  color: #1a1a1a;
 }
 
 .tshirts-grid {

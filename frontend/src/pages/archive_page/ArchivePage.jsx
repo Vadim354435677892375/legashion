@@ -1,9 +1,8 @@
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
-import { useCart } from '../../context/CartContext';
 import './ArchivePage.css';
 import logo from '../../assets/logo-glitch.gif';
-import cartIcon from '../../assets/icons/cart-icon.png';
+import CartButton from '../../components/CartButton';
 import { ARCHIVE_ITEMS } from './archiveItems';
 
 // Страница коллекции «Archive» — отдельная страница в файловой системе,
@@ -79,8 +78,6 @@ function BannerCarousel({ slideCount }) {
 }
 
 export default function ArchivePage() {
-  const { totalCount } = useCart();
-
   return (
     <div className="archive-page">
       <Link className="archive-back-top" to="/home">
@@ -119,27 +116,7 @@ export default function ArchivePage() {
         вернуться на главную
       </Link>
 
-      <Link
-        to="/cart"
-        style={{
-          position: 'fixed',
-          bottom: '20px',
-          right: '100px',
-          zIndex: 1000,
-        }}
-      >
-        <img
-          src={cartIcon}
-          alt="Корзина"
-          style={{
-            width: '60px',
-            height: 'auto',
-            cursor: 'pointer',
-            filter: 'drop-shadow(0 2px 6px rgba(0, 0, 0, 0.35))',
-          }}
-        />
-        {totalCount > 0 && <span className="archive-cart-count">{totalCount}</span>}
-      </Link>
+      <CartButton />
     </div>
   );
 }

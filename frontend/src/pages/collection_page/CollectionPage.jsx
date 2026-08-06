@@ -1,8 +1,7 @@
 import { Link, useParams } from 'react-router-dom';
-import { useCart } from '../../context/CartContext';
 import './CollectionPage.css';
 import logo from '../../assets/logo-glitch.gif';
-import cartIcon from '../../assets/icons/cart-icon.png';
+import CartButton from '../../components/CartButton';
 import { COLLECTIONS } from './collectionItems';
 
 // Страница отдельной коллекции (открывается по клику на карточку в блоке
@@ -32,7 +31,6 @@ function MarqueeBar({ text }) {
 
 export default function CollectionPage() {
   const { slug } = useParams();
-  const { totalCount } = useCart();
   const collection = COLLECTIONS[slug] ?? COLLECTIONS['new-collection'];
 
   return (
@@ -82,27 +80,7 @@ export default function CollectionPage() {
         вернуться на главную
       </Link>
 
-      <Link
-        to="/cart"
-        style={{
-          position: 'fixed',
-          bottom: '20px',
-          right: '100px',
-          zIndex: 1000,
-        }}
-      >
-        <img
-          src={cartIcon}
-          alt="Корзина"
-          style={{
-            width: '60px',
-            height: 'auto',
-            cursor: 'pointer',
-            filter: 'drop-shadow(0 2px 6px rgba(0, 0, 0, 0.35))',
-          }}
-        />
-        {totalCount > 0 && <span className="collection-cart-count">{totalCount}</span>}
-      </Link>
+      <CartButton />
     </div>
   );
 }

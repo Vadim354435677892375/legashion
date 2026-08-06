@@ -1,28 +1,19 @@
 import { Link } from 'react-router-dom';
-import { useCart } from '../../context/CartContext';
 import './SalePage.css';
-import cartIcon from '../../assets/icons/cart-icon.png';
+import CartButton from '../../components/CartButton';
+import { SALE_ITEMS, getDiscountedPrice } from './saleItems';
 
 // Страница «Sale» — отдельная страница в файловой системе, по аналогии
 // с pages/archive_page. Открывается по клику на карточку Sale в блоке
 // «Категории» на главной (маршрут /sale).
-// discount — процент скидки, показывается в красном бейдже на карточке.
-// Когда появится реальный каталог товаров со скидкой — заменить ITEMS ниже.
-
-const ITEMS = [
-  { name: 'T-shirt "Eminem"', price: 1800, discount: 20, image: null },
-  { name: 'T-shirt "Eminem"', price: 1800, discount: 20, image: null },
-  { name: 'T-shirt "Eminem"', price: 1800, discount: 20, image: null },
-  { name: 'T-shirt "Eminem"', price: 1800, discount: 20, image: null },
-];
+// Данные товаров — в saleItems.js (общие с ProductPage, чтобы цена и
+// скидка совпадали).
 
 function formatPrice(value) {
   return `${value.toLocaleString('ru-RU')} \u20BD`;
 }
 
 export default function SalePage() {
-  const { totalCount } = useCart();
-
   return (
     <div className="sale-page">
       <div className="sale-tape" aria-hidden="true" />
@@ -36,8 +27,8 @@ export default function SalePage() {
       </header>
 
       <div className="sale-grid">
-        {ITEMS.map(({ name, price, discount, image }, i) => {
-          const discounted = Math.round(price * (1 - discount / 100));
+        {SALE_ITEMS.map(({ name, price, discount, image }, i) => {
+          const discounted = getDiscountedPrice(price, discount);
           return (
             <Link
               className="sale-card"
@@ -66,27 +57,7 @@ export default function SalePage() {
         вернуться на главную
       </Link>
 
-      <Link
-        to="/cart"
-        style={{
-          position: 'fixed',
-          bottom: '20px',
-          right: '100px',
-          zIndex: 1000,
-        }}
-      >
-        <img
-          src={cartIcon}
-          alt="Корзина"
-          style={{
-            width: '60px',
-            height: 'auto',
-            cursor: 'pointer',
-            filter: 'drop-shadow(0 2px 6px rgba(0, 0, 0, 0.35))',
-          }}
-        />
-        {totalCount > 0 && <span className="sale-cart-count">{totalCount}</span>}
-      </Link>
+      <CartButton />
     </div>
   );
 }
