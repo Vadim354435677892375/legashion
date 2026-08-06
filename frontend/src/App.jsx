@@ -8,6 +8,7 @@ import CheckoutPage from './pages/checkout_page/CheckoutPage'; // оформле
 import CollectionPage from './pages/collection_page/CollectionPage'; // страница коллекции (New Collection / Sale)
 import ArchivePage from './pages/archive_page/ArchivePage'; // отдельная страница коллекции Archive
 import SalePage from './pages/sale_page/SalePage'; // отдельная страница коллекции Sale
+import TshirtsPage from './pages/tshirts_page/TshirtsPage'; // отдельная страница коллекции Футболки
 
 export default function App() {
   return (
@@ -20,6 +21,7 @@ export default function App() {
           <Route path="/collection/:slug" element={<CollectionPage />} />
           <Route path="/archive" element={<ArchivePage />} />
           <Route path="/sale" element={<SalePage />} />
+          <Route path="/tshirts" element={<TshirtsPage />} />
           <Route path="/cart" element={<CartPage />} />
           <Route path="/checkout" element={<CheckoutPage />} />
         </Routes>

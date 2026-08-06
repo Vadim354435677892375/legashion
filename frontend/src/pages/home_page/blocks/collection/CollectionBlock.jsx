@@ -16,7 +16,7 @@ const CATEGORIES = [
   { label: 'Archive', image: null, to: '/archive' },
   { label: 'Sale', image: null, to: '/sale' },
   { label: 'Лонгсливы', image: null, slug: null },
-  { label: 'Футболки', image: null, slug: null },
+  { label: 'Футболки', image: null, to: '/tshirts' },
 ];
 
 export default function Categories() {
