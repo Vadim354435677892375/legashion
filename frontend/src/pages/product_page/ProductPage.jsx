@@ -7,6 +7,9 @@ import SystemMessage from './blocks/system-message/SystemMessage';
 import OrderBlock from './blocks/order/OrderBlock';
 import { SALE_ITEMS, getDiscountedPrice } from '../sale_page/saleItems';
 import { TSHIRT_ITEMS } from '../tshirts_page/tshirtItems';
+import { ARCHIVE_ITEMS } from '../archive_page/archiveItems';
+import { HOME_PRODUCTS } from '../home_page/blocks/products/homeProducts';
+import { COLLECTIONS } from '../collection_page/collectionItems';
 
 // Страница «Карточка товара».
 // images: пути к фото товара для галереи (сейчас — плейсхолдеры, [] пока фото нет).
@@ -26,33 +29,38 @@ const FALLBACK_PRODUCT = {
 // По :id определяем, что за товар открыт. Карточки Sale ведут на
 // /product/sale-<индекс> (см. SalePage) — для них берём цену и скидку
 // из общих данных saleItems.js, чтобы они совпадали со страницей Sale.
+// Списки, из которых можно взять товар по id вида "<префикс>-<индекс>"
+// (именно так на карточки товаров ссылаются страницы разделов — см.
+// SalePage, TshirtsPage, ArchivePage, Products). Коллекции (New Collection
+// и т.п.) добавляются сюда же по своему slug — у каждой свой префикс.
+const SOURCES = [
+  { prefix: 'sale-', items: SALE_ITEMS },
+  { prefix: 'tshirts-', items: TSHIRT_ITEMS },
+  { prefix: 'archive-', items: ARCHIVE_ITEMS },
+  { prefix: 'home-', items: HOME_PRODUCTS },
+  ...Object.entries(COLLECTIONS).map(([slug, { items }]) => ({
+    prefix: `${slug}-`,
+    items,
+  })),
+];
+
 function resolveProduct(id) {
-  if (id && id.startsWith('sale-')) {
-    const index = Number(id.slice('sale-'.length));
-    const item = SALE_ITEMS[index];
-    if (item) {
-      return {
-        name: item.name,
-        price: item.price,
-        discount: item.discount,
-        images: item.image ? [item.image] : [],
-        details: FALLBACK_PRODUCT.details,
-      };
-    }
+  if (!id) return FALLBACK_PRODUCT;
+
+  for (const { prefix, items } of SOURCES) {
+    if (!id.startsWith(prefix)) continue;
+    const index = Number(id.slice(prefix.length));
+    const item = items[index];
+    if (!item) continue;
+    return {
+      name: item.name,
+      price: item.price,
+      discount: item.discount || 0,
+      images: item.image ? [item.image] : [],
+      details: FALLBACK_PRODUCT.details,
+    };
   }
-  if (id && id.startsWith('tshirts-')) {
-    const index = Number(id.slice('tshirts-'.length));
-    const item = TSHIRT_ITEMS[index];
-    if (item) {
-      return {
-        name: item.name,
-        price: item.price,
-        discount: 0,
-        images: item.image ? [item.image] : [],
-        details: FALLBACK_PRODUCT.details,
-      };
-    }
-  }
+
   return FALLBACK_PRODUCT;
 }
 

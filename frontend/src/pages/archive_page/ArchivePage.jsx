@@ -4,18 +4,13 @@ import { useCart } from '../../context/CartContext';
 import './ArchivePage.css';
 import logo from '../../assets/logo-glitch.gif';
 import cartIcon from '../../assets/icons/cart-icon.png';
+import { ARCHIVE_ITEMS } from './archiveItems';
 
 // Страница коллекции «Archive» — отдельная страница в файловой системе,
 // по аналогии с pages/collection_page. Открывается по клику на карточку
 // Archive в блоке «Категории» на главной (маршрут /archive).
-// Когда появится реальный каталог архивных вещей — заменить ITEMS ниже.
-
-const ITEMS = [
-  { name: 'T-shirt "Eminem"', price: 1800, image: null },
-  { name: 'T-shirt "Eminem"', price: 1800, image: null },
-  { name: 'T-shirt "Eminem"', price: 1800, image: null },
-  { name: 'T-shirt "Eminem"', price: 1800, image: null },
-];
+// Данные товаров — в archiveItems.js (общие с ProductPage, чтобы название
+// и цена совпадали).
 
 // Число слайдов в баннере-карусели. Пока фото нет — слайды пустые серые
 // плейсхолдеры; когда появятся фото архива, сюда нужно будет передать
@@ -102,7 +97,7 @@ export default function ArchivePage() {
       <BannerCarousel slideCount={BANNER_SLIDE_COUNT} />
 
       <div className="archive-grid">
-        {ITEMS.map(({ name, price, image }, i) => (
+        {ARCHIVE_ITEMS.map(({ name, price, image }, i) => (
           <Link
             className="archive-card"
             to={`/product/archive-${i}`}

@@ -1,17 +1,10 @@
 import { Link } from 'react-router-dom';
 import './Products.css';
+import { HOME_PRODUCTS } from './homeProducts';
 
 // Блок «Товары» — сетка карточек 2 в ряд.
-// image: путь к реальному фото товара, когда оно будет готово (например '/assets/products/eminem-tee.jpg').
-// Пока фото нет — рисуется серый плейсхолдер.
-const PRODUCTS = [
-  { name: 'T-shirt "Eminem"', price: 1800, image: null },
-  { name: 'T-shirt "Eminem"', price: 1800, image: null },
-  { name: 'T-shirt "Eminem"', price: 1800, image: null },
-  { name: 'T-shirt "Eminem"', price: 1800, image: null },
-  { name: 'T-shirt "Eminem"', price: 1800, image: null },
-  { name: 'T-shirt "Eminem"', price: 1800, image: null },
-];
+// Данные — в homeProducts.js (общие с ProductPage, чтобы название и цена
+// совпадали).
 
 function formatPrice(value) {
   return `${value.toLocaleString('ru-RU')} \u20BD`;
@@ -20,8 +13,8 @@ function formatPrice(value) {
 export default function Products() {
   return (
     <div className="products">
-      {PRODUCTS.map(({ name, price, image }, i) => (
-        <Link className="product-card" to={`/product/${i}`} key={`${name}-${i}`}>
+      {HOME_PRODUCTS.map(({ name, price, image }, i) => (
+        <Link className="product-card" to={`/product/home-${i}`} key={`${name}-${i}`}>
           <div
             className="product-image"
             style={image ? { backgroundImage: `url(${image})` } : undefined}

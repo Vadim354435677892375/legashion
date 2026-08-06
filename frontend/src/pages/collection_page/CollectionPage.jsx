@@ -3,26 +3,13 @@ import { useCart } from '../../context/CartContext';
 import './CollectionPage.css';
 import logo from '../../assets/logo-glitch.gif';
 import cartIcon from '../../assets/icons/cart-icon.png';
+import { COLLECTIONS } from './collectionItems';
 
 // Страница отдельной коллекции (открывается по клику на карточку в блоке
 // «Категории» на главной). Archive вынесен в свою собственную страницу
 // (pages/archive_page/ArchivePage.jsx) — здесь остаются коллекции без
-// отдельного файла, различаются заголовком и набором товаров. Когда
-// появится реальный каталог — items нужно будет брать по slug из данных
-// коллекции, а не из константы ниже.
-
-const COLLECTIONS = {
-  'new-collection': {
-    title: 'NEW COLLECTION',
-    marquee: 'NEW COLLECTION',
-    items: [
-      { name: 'T-shirt "Eminem"', price: 1800, image: null },
-      { name: 'T-shirt "Eminem"', price: 1800, image: null },
-      { name: 'T-shirt "Eminem"', price: 1800, image: null },
-      { name: 'T-shirt "Eminem"', price: 1800, image: null },
-    ],
-  },
-};
+// отдельного файла, различаются заголовком и набором товаров.
+// Данные — в collectionItems.js (общие с ProductPage).
 
 function formatPrice(value) {
   return `${value.toLocaleString('ru-RU')} \u20BD`;
