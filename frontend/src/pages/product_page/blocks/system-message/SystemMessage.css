@@ -58,6 +58,61 @@
   line-height: 1.9;
 }
 
+.sysmsg-order {
+  margin-top: 24px;
+  padding-top: 20px;
+  border-top: 1px solid #b4b4b4;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 14px;
+}
+
+.sysmsg-order-size {
+  width: 180px;
+  padding: 12px 14px;
+  border: 2px solid #0a0a0a;
+  border-radius: 4px;
+  background: linear-gradient(to bottom, #f4f4f4, #cfcfcf);
+  font-family: var(--font-main);
+  font-size: 16px;
+  font-weight: 600;
+  color: #1a1a1a;
+  text-align: center;
+  text-align-last: center;
+  cursor: pointer;
+}
+
+.sysmsg-order-add-btn {
+  width: 240px;
+  padding: 14px 16px;
+  border: 2px solid #0a1f6b;
+  border-radius: 4px;
+  background: linear-gradient(
+    to bottom,
+    #5c9df1 0%,
+    #2e6fe0 30%,
+    #1454cf 60%,
+    #0d3fb0 100%
+  );
+  box-shadow: 0 0 0 1px #274fc9 inset, 0 3px 8px rgba(0, 0, 0, 0.35);
+  font-family: var(--font-main);
+  font-size: 16px;
+  font-weight: 700;
+  color: #fff;
+  cursor: pointer;
+  transition: transform 0.15s ease, box-shadow 0.15s ease;
+}
+
+.sysmsg-order-add-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 0 0 1px #274fc9 inset, 0 6px 14px rgba(0, 0, 0, 0.45);
+}
+
+.sysmsg-order-add-btn:active {
+  transform: translateY(0);
+}
+
 .sysmsg-reopen {
   display: flex;
   align-items: center;

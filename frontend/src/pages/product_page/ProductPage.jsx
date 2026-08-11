@@ -4,7 +4,6 @@ import { useCart } from '../../context/CartContext';
 import './ProductPage.css';
 import Gallery from './blocks/gallery/Gallery';
 import SystemMessage from './blocks/system-message/SystemMessage';
-import OrderBlock from './blocks/order/OrderBlock';
 import { SALE_ITEMS, getDiscountedPrice } from '../sale_page/saleItems';
 import { TSHIRT_ITEMS } from '../tshirts_page/tshirtItems';
 import { ARCHIVE_ITEMS } from '../archive_page/archiveItems';
@@ -110,8 +109,7 @@ export default function ProductPage() {
       </div>
 
       <Gallery images={PRODUCT.images} />
-      <SystemMessage details={PRODUCT.details} />
-      <OrderBlock onAddToCart={handleAddToCart} />
+      <SystemMessage details={PRODUCT.details} onAddToCart={handleAddToCart} />
     </div>
   );
 }
