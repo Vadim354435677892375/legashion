@@ -1,5 +1,6 @@
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import { CartProvider } from './context/CartContext';
+import ScrollToTop from './components/ScrollToTop';
 import Intro from './components/Intro';
 import Home from './pages/home_page/Home'; // главная страница магазина, блоки — в pages/glavnaya-stranica/blocks
 import ProductPage from './pages/product_page/ProductPage'; // карточка товара, блоки — в pages/product_page/blocks
@@ -14,6 +15,7 @@ export default function App() {
   return (
     <CartProvider>
       <BrowserRouter>
+        <ScrollToTop />
         <Routes>
           <Route path="/" element={<Intro />} />
           <Route path="/home" element={<Home />} />

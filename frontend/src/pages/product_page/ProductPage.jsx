@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { useNavigate, useParams } from 'react-router-dom';
+import { Link, useNavigate, useParams } from 'react-router-dom';
 import { useCart } from '../../context/CartContext';
 import './ProductPage.css';
 import Gallery from './blocks/gallery/Gallery';
@@ -103,10 +103,10 @@ export default function ProductPage() {
         ← назад
       </button>
 
-      <div className="product-cart-indicator">
+      <Link className="product-cart-indicator" to="/cart">
         <span>в корзину</span>
         {cartCount > 0 && <span className="product-cart-count">{cartCount}</span>}
-      </div>
+      </Link>
 
       <Gallery images={PRODUCT.images} />
       <SystemMessage details={PRODUCT.details} onAddToCart={handleAddToCart} />

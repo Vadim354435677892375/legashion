@@ -10,11 +10,15 @@
 .cart-back {
   display: inline-block;
   margin-bottom: 16px;
+  border: none;
+  background: none;
+  padding: 0;
   color: #1a1a1a;
   font-family: var(--font-main);
   font-size: 15px;
   font-weight: 600;
   text-decoration: none;
+  cursor: pointer;
 }
 
 .cart-back:hover {

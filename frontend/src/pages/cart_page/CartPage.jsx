@@ -1,4 +1,4 @@
-import { Link } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import { useCart } from '../../context/CartContext';
 import CartItem from './blocks/cart-item/CartItem';
 import CartSummary from './blocks/summary/CartSummary';
@@ -8,12 +8,24 @@ import './CartPage.css';
 // поэтому товары, добавленные на странице товара, реально отображаются здесь.
 export default function CartPage() {
   const { items, updateQty, removeItem, totalPrice } = useCart();
+  const navigate = useNavigate();
+
+  // Закрытие корзины возвращает туда, откуда её открыли (карточка товара,
+  // главная и т.д.), а не всегда на /home — так же, как «назад» на карточке
+  // товара. Если истории нет (открыли ссылку напрямую) — уходим на главную.
+  const goBack = () => {
+    if (window.history.length > 1) {
+      navigate(-1);
+    } else {
+      navigate('/home');
+    }
+  };
 
   return (
     <div className="cart-page">
-      <Link className="cart-back" to="/home">
+      <button type="button" className="cart-back" onClick={goBack}>
         ← назад
-      </Link>
+      </button>
 
       <h1 className="cart-title">корзина</h1>
 

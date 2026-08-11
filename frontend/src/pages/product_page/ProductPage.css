@@ -13,6 +13,8 @@
   font-family: var(--font-main);
   font-size: 15px;
   color: #1a1a1a;
+  text-decoration: none;
+  cursor: pointer;
 }
 
 .product-cart-count {
