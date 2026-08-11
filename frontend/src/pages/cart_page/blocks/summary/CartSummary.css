@@ -1,10 +1,9 @@
 .cart-summary {
   display: flex;
-  align-items: center;
-  justify-content: flex-end;
-  gap: 24px;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 16px;
   margin-top: 32px;
-  flex-wrap: wrap;
 }
 
 .cart-summary-total {
