@@ -1,3 +1,16 @@
+@font-face {
+  font-family: 'Koganejidainogemu';
+  src: url('/fonts/Koganejidainogemu.woff2') format('woff2'),
+       url('/fonts/Koganejidainogemu.ttf') format('truetype');
+  font-weight: normal;
+  font-style: normal;
+  font-display: swap;
+}
+
+:root {
+  --font-main: 'Koganejidainogemu', 'Segoe UI', Tahoma, sans-serif;
+}
+
 * {
   margin: 0;
   padding: 0;
@@ -9,6 +22,6 @@ html, body, #root {
 }
 
 body {
-  font-family: 'Segoe UI', Tahoma, sans-serif;
+  font-family: var(--font-main);
   background: #C0C0C0;
 }

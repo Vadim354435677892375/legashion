@@ -9,7 +9,7 @@
   display: flex;
   align-items: center;
   gap: 10px;
-  font-family: 'Segoe UI', Tahoma, sans-serif;
+  font-family: var(--font-main);
   font-size: 15px;
   font-weight: 600;
   color: #1a1a1a;
@@ -34,7 +34,7 @@
   display: flex;
   align-items: flex-start;
   gap: 10px;
-  font-family: 'Segoe UI', Tahoma, sans-serif;
+  font-family: var(--font-main);
   font-size: 12px;
   color: #3a3a3a;
   cursor: pointer;
@@ -54,7 +54,7 @@
 }
 
 .payment-error {
-  font-family: 'Segoe UI', Tahoma, sans-serif;
+  font-family: var(--font-main);
   font-size: 12px;
   color: #7a1a1a;
 }

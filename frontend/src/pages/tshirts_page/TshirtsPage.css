@@ -4,7 +4,7 @@
   min-height: 100vh;
   padding: 32px 20px 80px;
   color: #fff;
-  font-family: 'Segoe UI', Tahoma, sans-serif;
+  font-family: var(--font-main);
 }
 
 .tshirts-back-top {
@@ -72,7 +72,7 @@
 
 .tshirts-card-name,
 .tshirts-card-price {
-  font-family: 'Silkscreen', 'Courier New', monospace;
+  font-family: var(--font-main);
   font-size: 11px;
   letter-spacing: 0.02em;
   line-height: 1.5;

@@ -4,7 +4,7 @@
   min-height: 100vh;
   padding: 32px 20px 80px;
   color: #fff;
-  font-family: 'Segoe UI', Tahoma, sans-serif;
+  font-family: var(--font-main);
 }
 
 .collection-back-top {
@@ -78,7 +78,7 @@
 }
 
 .marquee-track span {
-  font-family: 'Silkscreen', 'Courier New', monospace;
+  font-family: var(--font-main);
   font-size: 12px;
   letter-spacing: 0.12em;
   color: #fff;
@@ -132,7 +132,7 @@
 }
 
 .collection-banner-text {
-  font-family: 'Segoe UI', Tahoma, sans-serif;
+  font-family: var(--font-main);
   font-size: 13px;
   color: #555;
 }
@@ -177,7 +177,7 @@
 
 .collection-card-name,
 .collection-card-price {
-  font-family: 'Silkscreen', 'Courier New', monospace;
+  font-family: var(--font-main);
   font-size: 11px;
   letter-spacing: 0.02em;
   line-height: 1.5;

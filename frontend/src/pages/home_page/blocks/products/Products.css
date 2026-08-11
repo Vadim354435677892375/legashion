@@ -40,7 +40,7 @@
 
 .product-name,
 .product-price {
-  font-family: 'Silkscreen', 'Courier New', monospace;
+  font-family: var(--font-main);
   font-size: 11px;
   letter-spacing: 0.02em;
   line-height: 1.5;

@@ -44,7 +44,7 @@
 }
 
 .phone-field-hint {
-  font-family: 'Segoe UI', Tahoma, sans-serif;
+  font-family: var(--font-main);
   font-size: 12px;
   color: #4a4a4a;
 }

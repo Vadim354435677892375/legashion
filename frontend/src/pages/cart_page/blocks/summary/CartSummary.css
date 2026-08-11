@@ -9,7 +9,7 @@
 
 .cart-summary-total {
   text-align: right;
-  font-family: 'Segoe UI', Tahoma, sans-serif;
+  font-family: var(--font-main);
 }
 
 .cart-summary-label {

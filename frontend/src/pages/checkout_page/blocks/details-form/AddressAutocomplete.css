@@ -50,7 +50,7 @@
 
 .address-autocomplete-item {
   padding: 10px 14px;
-  font-family: 'Segoe UI', Tahoma, sans-serif;
+  font-family: var(--font-main);
   font-size: 15px;
   font-weight: 600;
   color: #1a1a1a;

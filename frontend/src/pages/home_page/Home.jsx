@@ -14,7 +14,7 @@ export default function GlavnayaStranica() {
       style={{
         minHeight: '100vh',
         color: '#fff',
-        fontFamily: "'Segoe UI', Tahoma, sans-serif",
+        fontFamily: "var(--font-main)",
         padding: '48px 20px',
       }}
     >

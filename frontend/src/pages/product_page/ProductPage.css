@@ -2,7 +2,7 @@
   min-height: 100vh;
   padding: 32px 24px 80px;
   color: #fff;
-  font-family: 'Segoe UI', Tahoma, sans-serif;
+  font-family: var(--font-main);
 }
 
 .product-cart-indicator {
@@ -10,7 +10,7 @@
   align-items: center;
   justify-content: center;
   gap: 8px;
-  font-family: 'Segoe UI', Tahoma, sans-serif;
+  font-family: var(--font-main);
   font-size: 15px;
   color: #1a1a1a;
 }
@@ -33,7 +33,7 @@
   display: inline-block;
   margin-bottom: 16px;
   color: #1a1a1a;
-  font-family: 'Segoe UI', Tahoma, sans-serif;
+  font-family: var(--font-main);
   font-size: 15px;
   font-weight: 600;
   text-decoration: none;

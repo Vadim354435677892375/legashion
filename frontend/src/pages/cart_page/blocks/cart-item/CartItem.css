@@ -33,7 +33,7 @@
 }
 
 .cart-item-image-placeholder {
-  font-family: 'Segoe UI', Tahoma, sans-serif;
+  font-family: var(--font-main);
   font-size: 12px;
   color: #6b6b6b;
 }
@@ -46,14 +46,14 @@
 }
 
 .cart-item-name {
-  font-family: 'Segoe UI', Tahoma, sans-serif;
+  font-family: var(--font-main);
   font-size: 16px;
   font-weight: 600;
   color: #1a1a1a;
 }
 
 .cart-item-size {
-  font-family: 'Segoe UI', Tahoma, sans-serif;
+  font-family: var(--font-main);
   font-size: 14px;
   color: #3a3a3a;
 }
@@ -63,7 +63,7 @@
   border: none;
   background: none;
   padding: 0;
-  font-family: 'Segoe UI', Tahoma, sans-serif;
+  font-family: var(--font-main);
   font-size: 13px;
   color: #7a1a1a;
   text-decoration: underline;
@@ -98,7 +98,7 @@
 .cart-item-qty-value {
   min-width: 18px;
   text-align: center;
-  font-family: 'Segoe UI', Tahoma, sans-serif;
+  font-family: var(--font-main);
   font-size: 15px;
   font-weight: 600;
   color: #1a1a1a;
@@ -106,7 +106,7 @@
 
 .cart-item-total {
   text-align: right;
-  font-family: 'Segoe UI', Tahoma, sans-serif;
+  font-family: var(--font-main);
   font-size: 18px;
   font-weight: 700;
   color: #1a1a1a;

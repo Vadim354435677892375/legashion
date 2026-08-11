@@ -84,7 +84,7 @@
 }
 
 .doc-label {
-  font-family: 'Silkscreen', 'Courier New', monospace;
+  font-family: var(--font-main);
   font-size: 11px;
   letter-spacing: 0.02em;
   line-height: 1.4;
@@ -165,7 +165,7 @@
 
 .doc-popup-text {
   margin-top: 14px;
-  font-family: 'Silkscreen', 'Courier New', monospace;
+  font-family: var(--font-main);
   font-size: 13px;
   line-height: 1.6;
   color: #1a1a1a;

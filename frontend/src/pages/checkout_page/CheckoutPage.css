@@ -4,7 +4,7 @@
   margin: 0 auto;
   padding: 24px 24px 100px;
   color: #1a1a1a;
-  font-family: 'Segoe UI', Tahoma, sans-serif;
+  font-family: var(--font-main);
 }
 
 .checkout-header {
@@ -99,7 +99,7 @@
   border: none;
   background: none;
   padding: 0;
-  font-family: 'Segoe UI', Tahoma, sans-serif;
+  font-family: var(--font-main);
   font-size: 13px;
   font-weight: 600;
   color: #1a1a1a;

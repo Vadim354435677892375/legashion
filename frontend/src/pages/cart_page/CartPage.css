@@ -4,14 +4,14 @@
   margin: 0 auto;
   padding: 32px 24px 100px;
   color: #1a1a1a;
-  font-family: 'Segoe UI', Tahoma, sans-serif;
+  font-family: var(--font-main);
 }
 
 .cart-back {
   display: inline-block;
   margin-bottom: 16px;
   color: #1a1a1a;
-  font-family: 'Segoe UI', Tahoma, sans-serif;
+  font-family: var(--font-main);
   font-size: 15px;
   font-weight: 600;
   text-decoration: none;

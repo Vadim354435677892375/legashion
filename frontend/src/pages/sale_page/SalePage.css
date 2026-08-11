@@ -4,7 +4,7 @@
   min-height: 100vh;
   padding: 0 20px 80px;
   color: #fff;
-  font-family: 'Segoe UI', Tahoma, sans-serif;
+  font-family: var(--font-main);
   overflow-x: hidden;
 }
 
@@ -109,7 +109,7 @@
   background: linear-gradient(to bottom, #ff5a4e 0%, #c81f12 55%, #8f0d05 100%);
   box-shadow: 0 2px 5px rgba(0, 0, 0, 0.5), inset 0 1px 0 rgba(255, 255, 255, 0.5);
   color: #fff;
-  font-family: 'Segoe UI', Tahoma, sans-serif;
+  font-family: var(--font-main);
   font-size: 12px;
   font-weight: 700;
   letter-spacing: 0.02em;
@@ -123,7 +123,7 @@
 }
 
 .sale-card-name {
-  font-family: 'Silkscreen', 'Courier New', monospace;
+  font-family: var(--font-main);
   font-size: 11px;
   letter-spacing: 0.02em;
   line-height: 1.5;
@@ -135,7 +135,7 @@
   align-items: baseline;
   justify-content: center;
   gap: 8px;
-  font-family: 'Silkscreen', 'Courier New', monospace;
+  font-family: var(--font-main);
   font-size: 11px;
   letter-spacing: 0.02em;
   line-height: 1.5;
