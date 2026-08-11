@@ -1,4 +1,3 @@
-import { useState } from 'react';
 import { Link, useNavigate, useParams } from 'react-router-dom';
 import { useCart } from '../../context/CartContext';
 import './ProductPage.css';
@@ -65,8 +64,7 @@ function resolveProduct(id) {
 
 export default function ProductPage() {
   const { id } = useParams();
-  const { addItem } = useCart();
-  const [cartCount, setCartCount] = useState(0);
+  const { addItem, totalCount } = useCart();
   const navigate = useNavigate();
 
   const PRODUCT = resolveProduct(id);
@@ -86,7 +84,6 @@ export default function ProductPage() {
   };
 
   const handleAddToCart = (size) => {
-    setCartCount((c) => c + 1);
     addItem({
       id: `${id ?? PRODUCT.name}-${size}`,
       name: PRODUCT.name,
@@ -105,7 +102,7 @@ export default function ProductPage() {
 
       <Link className="product-cart-indicator" to="/cart">
         <span>в корзину</span>
-        {cartCount > 0 && <span className="product-cart-count">{cartCount}</span>}
+        {totalCount > 0 && <span className="product-cart-count">{totalCount}</span>}
       </Link>
 
       <Gallery images={PRODUCT.images} />
