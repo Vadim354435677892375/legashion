@@ -10,8 +10,10 @@ export default function CartSummary({ totalPrice }) {
   return (
     <div className="cart-summary">
       <div className="cart-summary-total">
-        <span className="cart-summary-label">итог:</span>
-        <span className="cart-summary-price">{formatPrice(totalPrice)}</span>
+        <div className="cart-summary-row">
+          <span className="cart-summary-label">итог:</span>
+          <span className="cart-summary-price">{formatPrice(totalPrice)}</span>
+        </div>
         <span className="cart-summary-note">без учёта скидки и доставки</span>
       </div>
 
