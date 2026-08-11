@@ -84,7 +84,7 @@
 }
 
 .categories-label span {
-  font-family: 'Times New Roman', Georgia, serif;
+  font-family: var(--font-main);
   font-size: 13px;
   font-weight: 700;
   letter-spacing: 0.06em;

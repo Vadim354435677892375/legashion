@@ -17,6 +17,10 @@
   box-sizing: border-box;
 }
 
+button, select, input, textarea, optgroup {
+  font-family: inherit;
+}
+
 html, body, #root {
   height: 100%;
 }
