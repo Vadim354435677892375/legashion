@@ -54,9 +54,21 @@
   color: #1e6fd9;
 }
 
+@media (max-width: 1024px) {
+  .products {
+    max-width: 520px;
+  }
+}
+
+@media (max-width: 768px) {
+  .products {
+    max-width: 420px;
+  }
+}
+
 @media (max-width: 480px) {
   .products {
-    max-width: 320px;
+    max-width: 100%;
     gap: 10px;
   }
   .product-name,

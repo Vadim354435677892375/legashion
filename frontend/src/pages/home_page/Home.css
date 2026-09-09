@@ -1,0 +1,24 @@
+.home-page {
+  min-height: 100vh;
+  color: #fff;
+  font-family: var(--font-main);
+  padding: 48px 20px;
+}
+
+@media (max-width: 1024px) {
+  .home-page {
+    padding: 40px 20px;
+  }
+}
+
+@media (max-width: 768px) {
+  .home-page {
+    padding: 32px 16px;
+  }
+}
+
+@media (max-width: 480px) {
+  .home-page {
+    padding: 24px 12px;
+  }
+}

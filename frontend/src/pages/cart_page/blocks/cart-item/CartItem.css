@@ -125,3 +125,10 @@
     text-align: left;
   }
 }
+
+@media (max-width: 480px) {
+  .cart-item-image {
+    width: 84px;
+    height: 84px;
+  }
+}

@@ -71,3 +71,18 @@
     display: none;
   }
 }
+
+@media (max-width: 768px) {
+  .cart-page {
+    padding: 24px 16px 80px;
+  }
+}
+
+@media (max-width: 480px) {
+  .cart-page {
+    padding: 20px 12px 80px;
+  }
+  .cart-title {
+    font-size: 22px;
+  }
+}

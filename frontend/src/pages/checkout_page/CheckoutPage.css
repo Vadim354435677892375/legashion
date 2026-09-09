@@ -148,3 +148,29 @@
 .checkout-to-cart:hover {
   text-decoration: underline;
 }
+
+@media (max-width: 768px) {
+  .checkout-page {
+    padding: 20px 20px 90px;
+  }
+}
+
+@media (max-width: 480px) {
+  .checkout-page {
+    padding: 16px 14px 90px;
+  }
+  .checkout-logo {
+    width: 170px;
+  }
+  .checkout-header-title {
+    font-size: 14px;
+  }
+  .checkout-continue-btn,
+  .checkout-back-btn {
+    width: 100%;
+    text-align: center;
+  }
+  .checkout-actions {
+    flex-direction: column-reverse;
+  }
+}

@@ -157,3 +157,19 @@
 .sysmsg-reopen:active {
   transform: translateY(0);
 }
+
+@media (max-width: 480px) {
+  .sysmsg-body {
+    padding: 20px 16px;
+    font-size: 14px;
+  }
+  .sysmsg-order-size,
+  .sysmsg-order-add-btn {
+    width: 100%;
+    max-width: 280px;
+  }
+  .sysmsg-reopen {
+    padding: 12px 18px;
+    font-size: 13px;
+  }
+}

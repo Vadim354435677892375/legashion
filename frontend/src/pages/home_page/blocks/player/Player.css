@@ -431,7 +431,7 @@
   filter: brightness(1.1);
 }
 
-@media (max-width: 640px) {
+@media (max-width: 768px) {
   .wmp-controls {
     padding: 8px 10px;
   }
@@ -440,5 +440,30 @@
   }
   .wmp-title span {
     font-size: 12px;
+  }
+}
+
+@media (max-width: 480px) {
+  .wmp-titlebar {
+    height: 32px;
+    padding: 0 4px 0 6px;
+  }
+  .wmp-play-circle {
+    width: 48px;
+    height: 48px;
+  }
+  .wmp-round-btn {
+    width: 26px;
+    height: 26px;
+  }
+  .wmp-round-btn.small {
+    width: 22px;
+    height: 22px;
+  }
+  .wmp-volume-range {
+    width: 46px;
+  }
+  .wmp-playlist {
+    max-width: 200px;
   }
 }

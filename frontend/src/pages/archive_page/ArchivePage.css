@@ -230,20 +230,65 @@
   font-weight: 700;
 }
 
-@media (max-width: 480px) {
+@media (max-width: 1024px) {
   .archive-grid,
   .archive-banner,
   .archive-carousel-dots,
   .archive-header {
-    max-width: 320px;
+    max-width: 520px;
+  }
+}
+
+@media (max-width: 768px) {
+  .archive-page {
+    padding: 24px 16px 60px;
+  }
+  .archive-grid,
+  .archive-banner,
+  .archive-carousel-dots,
+  .archive-header {
+    max-width: 420px;
+  }
+  .archive-banner,
+  .archive-carousel-viewport {
+    min-height: 260px;
+    height: 260px;
+  }
+}
+
+@media (max-width: 480px) {
+  .archive-page {
+    padding: 20px 12px 48px;
+  }
+  .archive-grid,
+  .archive-banner,
+  .archive-carousel-dots,
+  .archive-header {
+    max-width: 100%;
   }
   .archive-banner,
   .archive-carousel-viewport {
     min-height: 220px;
     height: 220px;
   }
+  .archive-grid {
+    gap: 10px;
+  }
   .archive-card-name,
   .archive-card-price {
     font-size: 10px;
+  }
+  .archive-title {
+    font-size: 20px;
+  }
+  .archive-carousel-arrow {
+    width: 30px;
+    height: 30px;
+  }
+  .archive-carousel-arrow--left {
+    left: 8px;
+  }
+  .archive-carousel-arrow--right {
+    right: 8px;
   }
 }

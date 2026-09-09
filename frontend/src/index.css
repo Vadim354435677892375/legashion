@@ -25,7 +25,20 @@ html, body, #root {
   height: 100%;
 }
 
+html {
+  -webkit-text-size-adjust: 100%;
+  text-size-adjust: 100%;
+}
+
 body {
   font-family: var(--font-main);
   background: #C0C0C0;
+  overflow-x: hidden;
 }
+
+img {
+  max-width: 100%;
+  height: auto;
+}
+
+/* Общие брейкпоинты проекта: 1024 (планшет альбомный), 768 (планшет), 480 (телефон) */

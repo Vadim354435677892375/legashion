@@ -46,3 +46,14 @@
 .order-add-btn:active {
   transform: translateY(0);
 }
+
+@media (max-width: 480px) {
+  .order-block {
+    padding: 0 8px;
+  }
+  .order-size,
+  .order-add-btn {
+    width: 100%;
+    max-width: 280px;
+  }
+}

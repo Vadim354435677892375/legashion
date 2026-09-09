@@ -92,9 +92,31 @@
   color: #163a7a;
 }
 
-@media (max-width: 640px) {
+@media (max-width: 1024px) {
   .categories {
-    max-width: 340px;
+    max-width: 700px;
+  }
+}
+
+@media (max-width: 768px) {
+  .categories {
+    max-width: 520px;
+    gap: 6px;
+  }
+
+  .categories-card {
+    flex: 0 0 calc((100% - 20px) / 2);
+  }
+}
+
+@media (max-width: 480px) {
+  .categories {
+    max-width: 100%;
+  }
+
+  .categories-arrow {
+    width: 30px;
+    height: 30px;
   }
 
   .categories-card {

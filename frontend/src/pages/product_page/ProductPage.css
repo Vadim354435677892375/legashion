@@ -54,3 +54,9 @@
     padding-top: 48px;
   }
 }
+
+@media (max-width: 480px) {
+  .product-page {
+    padding: 20px 14px 60px;
+  }
+}

@@ -221,18 +221,51 @@
   font-weight: 700;
 }
 
-@media (max-width: 480px) {
+@media (max-width: 1024px) {
   .collection-grid,
   .collection-banner,
   .collection-header,
   .marquee-bar {
-    max-width: 320px;
+    max-width: 520px;
+  }
+}
+
+@media (max-width: 768px) {
+  .collection-page {
+    padding: 24px 16px 60px;
+  }
+  .collection-grid,
+  .collection-banner,
+  .collection-header,
+  .marquee-bar {
+    max-width: 420px;
+  }
+  .collection-banner {
+    min-height: 260px;
+  }
+}
+
+@media (max-width: 480px) {
+  .collection-page {
+    padding: 20px 12px 48px;
+  }
+  .collection-grid,
+  .collection-banner,
+  .collection-header,
+  .marquee-bar {
+    max-width: 100%;
   }
   .collection-banner {
     min-height: 220px;
   }
+  .collection-grid {
+    gap: 10px;
+  }
   .collection-card-name,
   .collection-card-price {
     font-size: 10px;
+  }
+  .collection-title {
+    font-size: 20px;
   }
 }

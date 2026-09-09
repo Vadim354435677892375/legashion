@@ -93,9 +93,16 @@
   text-shadow: 1px 1px 0 rgba(0, 0, 0, 0.6);
 }
 
+@media (max-width: 768px) {
+  .info-block {
+    max-width: 460px;
+    gap: 16px;
+  }
+}
+
 @media (max-width: 480px) {
   .info-block {
-    max-width: 340px;
+    max-width: 100%;
     gap: 10px;
   }
   .doc-stack {
@@ -104,6 +111,16 @@
   }
   .doc-label {
     font-size: 9px;
+  }
+}
+
+@media (max-width: 360px) {
+  .doc-stack {
+    width: 60px;
+    height: 72px;
+  }
+  .doc-label {
+    font-size: 8px;
   }
 }
 
