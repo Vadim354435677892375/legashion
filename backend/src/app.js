@@ -45,3 +45,9 @@ app.use('/api/admin/upload', requireAdmin, adminUploadRouter);
 
 app.use((req, res) => res.status(404).json({ error: 'Маршрут не найден' }));
 app.use(errorHandler);
+
+// Vercel в режиме встроенной поддержки Express-проектов (см. предупреждение
+// "Internal rewrites in backend framework projects" в билд-логах) ищет точку
+// входа именно здесь и ожидает default export — оставляем и его, и именованный
+// export const app выше (используется в api/index.js и локальном server.js).
+export default app;
