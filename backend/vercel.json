@@ -1,6 +1,8 @@
 {
   "functions": {
-    "api/index.js": {}
+    "api/index.js": {
+      "runtime": "nodejs20.x"
+    }
   },
   "rewrites": [{ "source": "/(.*)", "destination": "/api/index" }]
 }
