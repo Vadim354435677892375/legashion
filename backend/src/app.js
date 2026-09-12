@@ -45,6 +45,7 @@ app.use('/api/admin/upload', requireAdmin, adminUploadRouter);
 
 app.use((req, res) =>
   res.status(404).json({ error: 'Маршрут не найден', debugPath: req.originalUrl, debugMethod: req.method })
+);
 app.use(errorHandler);
 
 // Vercel в режиме встроенной поддержки Express-проектов (см. предупреждение
