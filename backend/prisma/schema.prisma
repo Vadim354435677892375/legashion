@@ -1,0 +1,123 @@
+// Схема БД legashion.
+// Товары привязываются к «коллекциям» (home / sale / archive / tshirts /
+// new-collection и любым новым, которые заведёт админ) через связь many-to-many
+// ProductCollection — это заменяет захардкоженные списки SALE_ITEMS/TSHIRT_ITEMS/...
+// на фронтенде: один и тот же товар может показываться сразу в нескольких разделах.
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")
+  directUrl = env("DIRECT_URL")
+}
+
+model Admin {
+  id           Int      @id @default(autoincrement())
+  email        String   @unique
+  passwordHash String
+  createdAt    DateTime @default(now())
+}
+
+model Collection {
+  id        Int                 @id @default(autoincrement())
+  slug      String              @unique // 'home' | 'sale' | 'archive' | 'tshirts' | 'new-collection' | ...
+  title     String // заголовок страницы коллекции, напр. "NEW COLLECTION"
+  marquee   String? // текст бегущей строки на странице коллекции
+  createdAt DateTime            @default(now())
+  products  ProductCollection[]
+}
+
+model Product {
+  id              Int                 @id @default(autoincrement())
+  name            String
+  price           Int // цена в рублях, целое число (как и на фронте сейчас)
+  discountPercent Int                 @default(0) // 0 — без скидки; >0 — карточка показывает старую/новую цену
+  density         String? // характеристика для System message на карточке товара
+  composition     String?
+  isActive        Boolean             @default(true) // выключенные товары не отдаются публичным API
+  createdAt       DateTime            @default(now())
+  updatedAt       DateTime            @updatedAt
+  images          ProductImage[]
+  collections     ProductCollection[]
+  orderItems      OrderItem[]
+}
+
+model ProductImage {
+  id        Int     @id @default(autoincrement())
+  url       String
+  position  Int     @default(0) // порядок в галерее (первое фото — обложка)
+  productId Int
+  product   Product @relation(fields: [productId], references: [id], onDelete: Cascade)
+
+  @@index([productId])
+}
+
+model ProductCollection {
+  productId    Int
+  collectionId Int
+  product      Product    @relation(fields: [productId], references: [id], onDelete: Cascade)
+  collection   Collection @relation(fields: [collectionId], references: [id], onDelete: Cascade)
+
+  @@id([productId, collectionId])
+}
+
+enum DeliveryType {
+  CDEK
+  RUSSIAN_POST
+}
+
+enum PaymentMethod {
+  CARD
+  SBP
+}
+
+enum OrderStatus {
+  NEW
+  PROCESSING
+  SHIPPED
+  COMPLETED
+  CANCELLED
+}
+
+// Заказ — гостевой (без личного кабинета), все данные покупателя
+// денормализованы прямо в заказе, как и вводятся в CheckoutPage.jsx.
+model Order {
+  id               Int           @id @default(autoincrement())
+  orderNumber      String        @unique
+  fullName         String
+  phoneCallingCode String
+  phone            String
+  countryCode      String
+  city             String
+  cityData         Json?
+  address          String
+  addressData      Json?
+  comment          String?
+  promoCode        String?
+  deliveryType     DeliveryType
+  paymentMethod    PaymentMethod
+  status           OrderStatus   @default(NEW)
+  totalPrice       Int
+  items            OrderItem[]
+  createdAt        DateTime      @default(now())
+  updatedAt        DateTime      @updatedAt
+}
+
+// Снимок товара на момент заказа — храним name/price/size отдельно от Product,
+// чтобы изменение или удаление товара в каталоге не искажало старые заказы.
+model OrderItem {
+  id        Int      @id @default(autoincrement())
+  orderId   Int
+  order     Order    @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  productId Int?
+  product   Product? @relation(fields: [productId], references: [id], onDelete: SetNull)
+  name      String
+  size      String?
+  price     Int
+  qty       Int
+
+  @@index([orderId])
+}

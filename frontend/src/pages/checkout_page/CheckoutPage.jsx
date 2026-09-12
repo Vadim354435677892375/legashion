@@ -1,8 +1,9 @@
 import { useState } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import { useCart } from '../../context/CartContext';
 import { DEFAULT_COUNTRY_CODE } from '../../utils/countries';
 import { DEFAULT_PHONE_CODE, PHONE_CODES } from '../../utils/phoneCodes';
+import { apiPost, ApiError } from '../../utils/api';
 import logo from '../../assets/logo-glitch.gif';
 import DeliveryBlock from './blocks/delivery/DeliveryBlock';
 import DetailsForm from './blocks/details-form/DetailsForm';
@@ -33,11 +34,15 @@ const INITIAL_DETAILS = {
   promoCode: '',
 };
 
-// Страница «Оформление заказа».
-// Отправка на бэкенд (сообщение администратору) пока не реализована —
-// когда появится API, submit нужно будет заменить на реальный запрос.
+// Значения радиокнопок на фронте → enum'ы бэкенда (см. backend/prisma/schema.prisma).
+const DELIVERY_TYPE_TO_API = { cdek: 'CDEK', 'russian-post': 'RUSSIAN_POST' };
+const PAYMENT_METHOD_TO_API = { card: 'CARD', sbp: 'SBP' };
+
+// Страница «Оформление заказа». Заказ гостевой (без аккаунта) — уходит на
+// POST /api/orders, бэкенд сам сохраняет его и уведомляет администратора
+// в Telegram и на почту (см. backend/src/routes/orders.js).
 export default function CheckoutPage() {
-  const { totalCount } = useCart();
+  const { items, totalCount, clearCart } = useCart();
   const navigate = useNavigate();
 
   const [deliveryType, setDeliveryType] = useState('cdek');
@@ -45,7 +50,8 @@ export default function CheckoutPage() {
   const [paymentMethod, setPaymentMethod] = useState('card');
   const [agreements, setAgreements] = useState({ terms: false, personalData: false });
   const [errors, setErrors] = useState({});
-  const [submitted, setSubmitted] = useState(false);
+  const [submitting, setSubmitting] = useState(false);
+  const [submittedOrderNumber, setSubmittedOrderNumber] = useState(null);
 
   const handleDetailsChange = (name, value) => {
     setDetails((prev) => {
@@ -89,6 +95,7 @@ export default function CheckoutPage() {
 
   const validate = () => {
     const nextErrors = {};
+    if (items.length === 0) nextErrors.cart = 'Корзина пуста';
     if (!details.fullName.trim()) nextErrors.fullName = 'Укажите ФИО';
     if (!details.phone.trim()) {
       nextErrors.phone = 'Укажите телефон';
@@ -117,13 +124,39 @@ export default function CheckoutPage() {
     return Object.keys(nextErrors).length === 0;
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    if (!validate()) return;
+    if (!validate() || submitting) return;
 
-    // TODO: когда появится бэкенд — отправлять заказ администратору здесь.
-    // Пока просто показываем, что форма прошла проверку.
-    setSubmitted(true);
+    setSubmitting(true);
+    try {
+      const order = await apiPost('/api/orders', {
+        fullName: details.fullName.trim(),
+        phoneCallingCode: details.phoneCallingCode,
+        phone: details.phone,
+        countryCode: details.countryCode,
+        city: details.city,
+        cityData: details.cityData,
+        address: details.address,
+        addressData: details.addressData,
+        comment: details.comment,
+        promoCode: details.promoCode,
+        deliveryType: DELIVERY_TYPE_TO_API[deliveryType] ?? 'CDEK',
+        paymentMethod: PAYMENT_METHOD_TO_API[paymentMethod] ?? 'CARD',
+        items: items.map((i) => ({ name: i.name, size: i.size ?? null, price: i.price, qty: i.qty })),
+      });
+
+      clearCart();
+      setSubmittedOrderNumber(order.orderNumber);
+    } catch (err) {
+      const message =
+        err instanceof ApiError
+          ? err.message
+          : 'Не удалось отправить заказ. Проверьте соединение и попробуйте ещё раз.';
+      setErrors((prev) => ({ ...prev, submit: message }));
+    } finally {
+      setSubmitting(false);
+    }
   };
 
   return (
@@ -156,11 +189,14 @@ export default function CheckoutPage() {
           errors={errors}
         />
 
-        {submitted && (
+        {submittedOrderNumber && (
           <p className="checkout-submitted-note">
-            Заказ оформлен. Отправка администратору пока в разработке — скоро с вами свяжутся.
+            Заказ {submittedOrderNumber} оформлен. Мы получили его и скоро с вами свяжемся.
           </p>
         )}
+
+        {errors.submit && <p className="checkout-submit-error">{errors.submit}</p>}
+        {errors.cart && <p className="checkout-submit-error">{errors.cart}</p>}
 
         <div className="checkout-actions">
           <button
@@ -170,8 +206,8 @@ export default function CheckoutPage() {
           >
             вернуться назад
           </button>
-          <button type="submit" className="checkout-continue-btn">
-            продолжить
+          <button type="submit" className="checkout-continue-btn" disabled={submitting}>
+            {submitting ? 'отправляем…' : 'продолжить'}
           </button>
         </div>
       </form>

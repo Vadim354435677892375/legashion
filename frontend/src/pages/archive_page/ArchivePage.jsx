@@ -3,22 +3,19 @@ import { Link } from 'react-router-dom';
 import './ArchivePage.css';
 import logo from '../../assets/logo-glitch.gif';
 import CartButton from '../../components/CartButton';
-import { ARCHIVE_ITEMS } from './archiveItems';
+import { useProducts } from '../../hooks/useProducts';
+import { formatPrice } from '../../utils/pricing';
 
 // Страница коллекции «Archive» — отдельная страница в файловой системе,
 // по аналогии с pages/collection_page. Открывается по клику на карточку
 // Archive в блоке «Категории» на главной (маршрут /archive).
-// Данные товаров — в archiveItems.js (общие с ProductPage, чтобы название
-// и цена совпадали).
+// Товары приходят с бэкенда (GET /api/products?collection=archive), заменяя
+// прежний захардкоженный archiveItems.js.
 
 // Число слайдов в баннере-карусели. Пока фото нет — слайды пустые серые
 // плейсхолдеры; когда появятся фото архива, сюда нужно будет передать
 // реальный список image-путей вместо slideCount.
 const BANNER_SLIDE_COUNT = 4;
-
-function formatPrice(value) {
-  return `${value.toLocaleString('ru-RU')} \u20BD`;
-}
 
 // Баннер-карусель: стрелки листают слайды, точки под баннером показывают
 // текущий слайд и позволяют перейти напрямую. Фото пока нет — вместо них
@@ -78,6 +75,8 @@ function BannerCarousel({ slideCount }) {
 }
 
 export default function ArchivePage() {
+  const { products, loading, error } = useProducts('archive');
+
   return (
     <div className="archive-page">
       <Link className="archive-back-top" to="/home">
@@ -93,24 +92,24 @@ export default function ArchivePage() {
 
       <BannerCarousel slideCount={BANNER_SLIDE_COUNT} />
 
-      <div className="archive-grid">
-        {ARCHIVE_ITEMS.map(({ name, price, image }, i) => (
-          <Link
-            className="archive-card"
-            to={`/product/archive-${i}`}
-            key={`${name}-${i}`}
-          >
-            <div
-              className="archive-card-image"
-              style={image ? { backgroundImage: `url(${image})` } : undefined}
-            />
-            <div className="archive-card-info">
-              <div className="archive-card-name">{name}</div>
-              <div className="archive-card-price">{formatPrice(price)}</div>
-            </div>
-          </Link>
-        ))}
-      </div>
+      {error && <p className="archive-error">Не удалось загрузить товары</p>}
+
+      {!loading && !error && (
+        <div className="archive-grid">
+          {products.map(({ id, name, price, images }) => (
+            <Link className="archive-card" to={`/product/${id}`} key={id}>
+              <div
+                className="archive-card-image"
+                style={images[0] ? { backgroundImage: `url(${images[0]})` } : undefined}
+              />
+              <div className="archive-card-info">
+                <div className="archive-card-name">{name}</div>
+                <div className="archive-card-price">{formatPrice(price)}</div>
+              </div>
+            </Link>
+          ))}
+        </div>
+      )}
 
       <Link className="archive-back" to="/home">
         вернуться на главную

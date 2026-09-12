@@ -1,76 +1,45 @@
+import { useEffect, useState } from 'react';
 import { Link, useNavigate, useParams } from 'react-router-dom';
 import { useCart } from '../../context/CartContext';
+import { apiGet } from '../../utils/api';
+import { getDiscountedPrice } from '../../utils/pricing';
 import './ProductPage.css';
 import Gallery from './blocks/gallery/Gallery';
 import SystemMessage from './blocks/system-message/SystemMessage';
-import { SALE_ITEMS, getDiscountedPrice } from '../sale_page/saleItems';
-import { TSHIRT_ITEMS } from '../tshirts_page/tshirtItems';
-import { ARCHIVE_ITEMS } from '../archive_page/archiveItems';
-import { HOME_PRODUCTS } from '../home_page/blocks/products/homeProducts';
-import { COLLECTIONS } from '../collection_page/collectionItems';
 
-// Страница «Карточка товара».
-// images: пути к фото товара для галереи (сейчас — плейсхолдеры, [] пока фото нет).
-// details: текст для окна System message (плотность, состав ткани и т.п.)
-// Заглушка для товаров без своих данных (пока нет общего каталога).
-const FALLBACK_PRODUCT = {
-  name: 'Товар',
-  price: 3000,
-  discount: 0,
-  images: [],
-  details: {
-    density: '—',
-    composition: '—',
-  },
-};
-
-// По :id определяем, что за товар открыт. Карточки Sale ведут на
-// /product/sale-<индекс> (см. SalePage) — для них берём цену и скидку
-// из общих данных saleItems.js, чтобы они совпадали со страницей Sale.
-// Списки, из которых можно взять товар по id вида "<префикс>-<индекс>"
-// (именно так на карточки товаров ссылаются страницы разделов — см.
-// SalePage, TshirtsPage, ArchivePage, Products). Коллекции (New Collection
-// и т.п.) добавляются сюда же по своему slug — у каждой свой префикс.
-const SOURCES = [
-  { prefix: 'sale-', items: SALE_ITEMS },
-  { prefix: 'tshirts-', items: TSHIRT_ITEMS },
-  { prefix: 'archive-', items: ARCHIVE_ITEMS },
-  { prefix: 'home-', items: HOME_PRODUCTS },
-  ...Object.entries(COLLECTIONS).map(([slug, { items }]) => ({
-    prefix: `${slug}-`,
-    items,
-  })),
-];
-
-function resolveProduct(id) {
-  if (!id) return FALLBACK_PRODUCT;
-
-  for (const { prefix, items } of SOURCES) {
-    if (!id.startsWith(prefix)) continue;
-    const index = Number(id.slice(prefix.length));
-    const item = items[index];
-    if (!item) continue;
-    return {
-      name: item.name,
-      price: item.price,
-      discount: item.discount || 0,
-      images: item.image ? [item.image] : [],
-      details: FALLBACK_PRODUCT.details,
-    };
-  }
-
-  return FALLBACK_PRODUCT;
-}
-
+// Страница «Карточка товара» — товар загружается с бэкенда по числовому id
+// (GET /api/products/:id). Раньше id был вида "sale-0"/"archive-2"/... и
+// резолвился по префиксу в один из захардкоженных списков (SOURCES) — теперь,
+// когда каталог живёт в БД, у товара всегда один настоящий id, из какой бы
+// коллекции на него ни перешли.
 export default function ProductPage() {
   const { id } = useParams();
   const { addItem, totalCount } = useCart();
   const navigate = useNavigate();
 
-  const PRODUCT = resolveProduct(id);
-  const finalPrice = PRODUCT.discount
-    ? getDiscountedPrice(PRODUCT.price, PRODUCT.discount)
-    : PRODUCT.price;
+  const [product, setProduct] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [notFound, setNotFound] = useState(false);
+
+  useEffect(() => {
+    const controller = new AbortController();
+    setLoading(true);
+    setNotFound(false);
+
+    apiGet(`/api/products/${id}`, { signal: controller.signal })
+      .then(setProduct)
+      .catch((err) => {
+        if (err.name === 'AbortError') return;
+        if (err.status === 404) {
+          setNotFound(true);
+        } else {
+          console.error(err);
+        }
+      })
+      .finally(() => setLoading(false));
+
+    return () => controller.abort();
+  }, [id]);
 
   // Возвращаемся туда, откуда пришли (главная, страница коллекции и т.д.),
   // а не всегда на /home. Если истории нет (открыли ссылку напрямую) —
@@ -84,12 +53,17 @@ export default function ProductPage() {
   };
 
   const handleAddToCart = (size) => {
+    if (!product) return;
+    const finalPrice = product.discountPercent
+      ? getDiscountedPrice(product.price, product.discountPercent)
+      : product.price;
+
     addItem({
-      id: `${id ?? PRODUCT.name}-${size}`,
-      name: PRODUCT.name,
+      id: `${product.id}-${size}`,
+      name: product.name,
       size,
       price: finalPrice,
-      discount: PRODUCT.discount || undefined,
+      discount: product.discountPercent || undefined,
       qty: 1,
     });
   };
@@ -105,8 +79,19 @@ export default function ProductPage() {
         {totalCount > 0 && <span className="product-cart-count">{totalCount}</span>}
       </Link>
 
-      <Gallery images={PRODUCT.images} />
-      <SystemMessage details={PRODUCT.details} onAddToCart={handleAddToCart} />
+      {notFound && <p className="product-not-found">Товар не найден</p>}
+
+      {!notFound && (
+        <>
+          <Gallery images={product?.images ?? []} />
+          <SystemMessage
+            details={{ density: product?.density ?? '—', composition: product?.composition ?? '—' }}
+            onAddToCart={handleAddToCart}
+          />
+        </>
+      )}
+
+      {loading && <p className="product-loading">Загрузка…</p>}
     </div>
   );
 }

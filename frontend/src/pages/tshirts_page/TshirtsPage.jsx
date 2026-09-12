@@ -1,22 +1,21 @@
 import { Link } from 'react-router-dom';
 import './TshirtsPage.css';
 import CartButton from '../../components/CartButton';
-import { TSHIRT_ITEMS } from './tshirtItems';
+import { useProducts } from '../../hooks/useProducts';
+import { formatPrice } from '../../utils/pricing';
 
 // Страница «Футболки» — отдельная страница в файловой системе, по аналогии
 // с pages/archive_page и pages/sale_page. Открывается по клику на карточку
 // «Футболки» в блоке «Категории» на главной (маршрут /tshirts).
 // heroImage: крупное фото футболки сверху страницы — пока плейсхолдер,
 // заменить на реальное фото, когда оно будет готово.
-// Данные товаров сетки — в tshirtItems.js (общие с ProductPage).
+// Товары сетки приходят с бэкенда (GET /api/products?collection=tshirts).
 
 const heroImage = null;
 
-function formatPrice(value) {
-  return `${value.toLocaleString('ru-RU')} \u20BD`;
-}
-
 export default function TshirtsPage() {
+  const { products, loading, error } = useProducts('tshirts');
+
   return (
     <div className="tshirts-page">
       <Link className="tshirts-back-top" to="/home">
@@ -28,24 +27,24 @@ export default function TshirtsPage() {
         style={heroImage ? { backgroundImage: `url(${heroImage})` } : undefined}
       />
 
-      <div className="tshirts-grid">
-        {TSHIRT_ITEMS.map(({ name, price, image }, i) => (
-          <Link
-            className="tshirts-card"
-            to={`/product/tshirts-${i}`}
-            key={`${name}-${i}`}
-          >
-            <div
-              className="tshirts-card-image"
-              style={image ? { backgroundImage: `url(${image})` } : undefined}
-            />
-            <div className="tshirts-card-info">
-              <div className="tshirts-card-name">{name}</div>
-              <div className="tshirts-card-price">{formatPrice(price)}</div>
-            </div>
-          </Link>
-        ))}
-      </div>
+      {error && <p className="tshirts-error">Не удалось загрузить товары</p>}
+
+      {!loading && !error && (
+        <div className="tshirts-grid">
+          {products.map(({ id, name, price, images }) => (
+            <Link className="tshirts-card" to={`/product/${id}`} key={id}>
+              <div
+                className="tshirts-card-image"
+                style={images[0] ? { backgroundImage: `url(${images[0]})` } : undefined}
+              />
+              <div className="tshirts-card-info">
+                <div className="tshirts-card-name">{name}</div>
+                <div className="tshirts-card-price">{formatPrice(price)}</div>
+              </div>
+            </Link>
+          ))}
+        </div>
+      )}
 
       <Link className="tshirts-back" to="/home">
         вернуться на главную

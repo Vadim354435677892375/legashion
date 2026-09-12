@@ -2,17 +2,16 @@ import { Link, useParams } from 'react-router-dom';
 import './CollectionPage.css';
 import logo from '../../assets/logo-glitch.gif';
 import CartButton from '../../components/CartButton';
-import { COLLECTIONS } from './collectionItems';
+import { useCollection } from '../../hooks/useCollection';
+import { useProducts } from '../../hooks/useProducts';
+import { formatPrice } from '../../utils/pricing';
 
 // Страница отдельной коллекции (открывается по клику на карточку в блоке
 // «Категории» на главной). Archive вынесен в свою собственную страницу
 // (pages/archive_page/ArchivePage.jsx) — здесь остаются коллекции без
 // отдельного файла, различаются заголовком и набором товаров.
-// Данные — в collectionItems.js (общие с ProductPage).
-
-function formatPrice(value) {
-  return `${value.toLocaleString('ru-RU')} \u20BD`;
-}
+// Заголовок/marquee и товары теперь приходят с бэкенда (GET /api/collections/:slug
+// и GET /api/products?collection=:slug) вместо прежнего collectionItems.js.
 
 // Бегущая строка по чёрной полосе. Текст повторяется несколько раз внутри
 // одного трека — так при бесконечной прокрутке на 50% ширины не видно шва.
@@ -29,9 +28,15 @@ function MarqueeBar({ text }) {
   );
 }
 
+const FALLBACK_TITLE = 'NEW COLLECTION';
+
 export default function CollectionPage() {
-  const { slug } = useParams();
-  const collection = COLLECTIONS[slug] ?? COLLECTIONS['new-collection'];
+  const { slug = 'new-collection' } = useParams();
+  const { collection } = useCollection(slug);
+  const { products, loading, error } = useProducts(slug);
+
+  const title = collection?.title ?? FALLBACK_TITLE;
+  const marquee = collection?.marquee ?? title;
 
   return (
     <div className="collection-page">
@@ -43,10 +48,10 @@ export default function CollectionPage() {
         <div className="collection-logo">
           <img src={logo} alt="LEGASHION" />
         </div>
-        <h1 className="collection-title">{collection.title}</h1>
+        <h1 className="collection-title">{title}</h1>
       </header>
 
-      <MarqueeBar text={collection.marquee} />
+      <MarqueeBar text={marquee} />
 
       <div className="collection-banner">
         <div className="collection-banner-placeholder">
@@ -55,26 +60,26 @@ export default function CollectionPage() {
         </div>
       </div>
 
-      <MarqueeBar text={collection.marquee} />
+      <MarqueeBar text={marquee} />
 
-      <div className="collection-grid">
-        {collection.items.map(({ name, price, image }, i) => (
-          <Link
-            className="collection-card"
-            to={`/product/${slug}-${i}`}
-            key={`${name}-${i}`}
-          >
-            <div
-              className="collection-card-image"
-              style={image ? { backgroundImage: `url(${image})` } : undefined}
-            />
-            <div className="collection-card-info">
-              <div className="collection-card-name">{name}</div>
-              <div className="collection-card-price">{formatPrice(price)}</div>
-            </div>
-          </Link>
-        ))}
-      </div>
+      {error && <p className="collection-error">Не удалось загрузить товары</p>}
+
+      {!loading && !error && (
+        <div className="collection-grid">
+          {products.map(({ id, name, price, images }) => (
+            <Link className="collection-card" to={`/product/${id}`} key={id}>
+              <div
+                className="collection-card-image"
+                style={images[0] ? { backgroundImage: `url(${images[0]})` } : undefined}
+              />
+              <div className="collection-card-info">
+                <div className="collection-card-name">{name}</div>
+                <div className="collection-card-price">{formatPrice(price)}</div>
+              </div>
+            </Link>
+          ))}
+        </div>
+      )}
 
       <Link className="collection-back" to="/home">
         вернуться на главную

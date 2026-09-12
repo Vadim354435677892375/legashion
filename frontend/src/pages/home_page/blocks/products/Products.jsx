@@ -1,23 +1,25 @@
 import { Link } from 'react-router-dom';
 import './Products.css';
-import { HOME_PRODUCTS } from './homeProducts';
+import { useProducts } from '../../../../hooks/useProducts';
+import { formatPrice } from '../../../../utils/pricing';
 
 // Блок «Товары» — сетка карточек 2 в ряд.
-// Данные — в homeProducts.js (общие с ProductPage, чтобы название и цена
-// совпадали).
-
-function formatPrice(value) {
-  return `${value.toLocaleString('ru-RU')} \u20BD`;
-}
-
+// Данные приходят с бэкенда (GET /api/products?collection=home), заменяя
+// прежний захардкоженный homeProducts.js — карточка товара ведёт на
+// /product/:id по реальному id из БД.
 export default function Products() {
+  const { products, loading, error } = useProducts('home');
+
+  if (loading) return null;
+  if (error) return <p className="products-error">Не удалось загрузить товары</p>;
+
   return (
     <div className="products">
-      {HOME_PRODUCTS.map(({ name, price, image }, i) => (
-        <Link className="product-card" to={`/product/home-${i}`} key={`${name}-${i}`}>
+      {products.map(({ id, name, price, images }) => (
+        <Link className="product-card" to={`/product/${id}`} key={id}>
           <div
             className="product-image"
-            style={image ? { backgroundImage: `url(${image})` } : undefined}
+            style={images[0] ? { backgroundImage: `url(${images[0]})` } : undefined}
           />
           <div className="product-info">
             <div className="product-name">{name}</div>

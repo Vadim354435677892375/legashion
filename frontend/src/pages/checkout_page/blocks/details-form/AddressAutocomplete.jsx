@@ -1,6 +1,5 @@
 import { useEffect, useRef, useState } from 'react';
 import { fetchSuggestions } from '../../../../utils/geocoding';
-import { DaDataConfigError } from '../../../../utils/dadata';
 import './AddressAutocomplete.css';
 
 const DEBOUNCE_MS = 300;
@@ -37,7 +36,7 @@ export default function AddressAutocomplete({
   const [open, setOpen] = useState(false);
   const [loading, setLoading] = useState(false);
   const [highlighted, setHighlighted] = useState(-1);
-  const [configError, setConfigError] = useState(false);
+  const [serverError, setServerError] = useState(false);
 
   const wrapperRef = useRef(null);
   const debounceRef = useRef(null);
@@ -85,13 +84,11 @@ export default function AddressAutocomplete({
         setSuggestions(results);
         setOpen(true);
         setHighlighted(-1);
+        setServerError(false);
       } catch (err) {
         if (err.name === 'AbortError') return;
-        if (err instanceof DaDataConfigError) {
-          setConfigError(true);
-        } else {
-          console.error(err);
-        }
+        console.error(err);
+        setServerError(true);
         setSuggestions([]);
       } finally {
         setLoading(false);
@@ -171,9 +168,9 @@ export default function AddressAutocomplete({
         </ul>
       )}
 
-      {configError && (
+      {serverError && (
         <span className="details-error">
-          Не настроен ключ DaData — см. frontend/.env.example
+          Не удалось загрузить подсказки адреса. Попробуйте ещё раз.
         </span>
       )}
     </div>
