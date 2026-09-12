@@ -1,8 +1,9 @@
-// Vercel-обёртка: серверлесс-функция принимает те же (req, res), что и обычный
-// http-хендлер, а инстанс Express-приложения именно такой хендлер и есть —
-// поэтому переиспользуем src/app.js один в один, без serverless-http и т.п.
-// Когда бэкенд переедет на свой сервер — просто запускается src/server.js,
-// эта обёртка становится не нужна, но и не мешает.
+// Vercel-обёртка: серверлесс-функция ожидает (req, res)-хендлер, объявленный
+// прямо в точке входа. Простое `export default app` (где app — реэкспорт из
+// другого файла) у некоторых версий Vercel Node.js-рантайма не проходит
+// проверку "default export must be a function" — оборачиваем явной функцией.
 import { app } from '../src/app.js';
 
-export default app;
+export default function handler(req, res) {
+  return app(req, res);
+}
