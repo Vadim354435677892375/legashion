@@ -1,5 +1,4 @@
 import express from 'express';
-import cors from 'cors';
 import 'dotenv/config';
 
 import { productsRouter } from './routes/products.js';
@@ -21,11 +20,25 @@ const allowedOrigins = (process.env.CORS_ORIGIN || '')
 
 export const app = express();
 
-app.use(
-  cors({
-    origin: allowedOrigins.length > 0 ? allowedOrigins : true,
-  })
-);
+app.use((req, res, next) => {
+  // Ставим CORS-заголовки вручную, а не через пакет `cors`: в связке с
+  // авто-определением Express-фреймворка на Vercel заголовки из `cors()`
+  // почему-то не долетали до браузера. Ручная установка — надёжнее.
+  const origin = req.headers.origin;
+  const isAllowed = allowedOrigins.length === 0 || (origin && allowedOrigins.includes(origin));
+
+  if (isAllowed && origin) {
+    res.setHeader('Access-Control-Allow-Origin', origin);
+    res.setHeader('Vary', 'Origin');
+  }
+  res.setHeader('Access-Control-Allow-Methods', 'GET,POST,PUT,PATCH,DELETE,OPTIONS');
+  res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization');
+
+  if (req.method === 'OPTIONS') {
+    return res.sendStatus(204);
+  }
+  next();
+});
 app.use(express.json({ limit: '2mb' }));
 
 app.get('/api/health', (req, res) =>
@@ -46,7 +59,6 @@ app.use('/api/admin/orders', requireAdmin, adminOrdersRouter);
 app.use('/api/admin/upload', requireAdmin, adminUploadRouter);
 
 app.use((req, res) => res.status(404).json({ error: 'Маршрут не найден' }));
-
 app.use(errorHandler);
 
 // Vercel в режиме встроенной поддержки Express-проектов (см. предупреждение
