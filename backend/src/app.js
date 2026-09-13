@@ -28,7 +28,9 @@ app.use(
 );
 app.use(express.json({ limit: '2mb' }));
 
-app.get('/api/health', (req, res) => res.json({ ok: true }));
+app.get('/api/health', (req, res) =>
+  res.json({ ok: true, corsOriginEnv: process.env.CORS_ORIGIN || null })
+);
 
 // Публичные роуты — доступны фронтенду магазина без авторизации.
 app.use('/api/products', productsRouter);
