@@ -10,6 +10,7 @@ import CollectionPage from './pages/collection_page/CollectionPage'; // стра
 import ArchivePage from './pages/archive_page/ArchivePage'; // отдельная страница коллекции Archive
 import SalePage from './pages/sale_page/SalePage'; // отдельная страница коллекции Sale
 import TshirtsPage from './pages/tshirts_page/TshirtsPage'; // отдельная страница коллекции Футболки
+import AdminPage from './pages/admin_page/AdminPage'; // админка: товары, коллекции, заказы
 
 export default function App() {
   return (
@@ -26,6 +27,7 @@ export default function App() {
           <Route path="/tshirts" element={<TshirtsPage />} />
           <Route path="/cart" element={<CartPage />} />
           <Route path="/checkout" element={<CheckoutPage />} />
+          <Route path="/admin" element={<AdminPage />} />
         </Routes>
       </BrowserRouter>
     </CartProvider>
