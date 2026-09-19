@@ -1,7 +1,8 @@
 import { createContext, useCallback, useContext, useMemo, useState } from 'react';
 
 // Общий контекст корзины.
-// item: { id, name, image, size, price, qty }
+// item: { id, productId, name, image, size, price, qty }
+// price здесь — только для показа в корзине; при оформлении заказа бэкенд берёт цену из БД по productId.
 // id должен быть уникальным для пары товар+размер (иначе один и тот же товар
 // в разных размерах затрёт друг друга).
 const CartContext = createContext(null);

@@ -16,15 +16,17 @@ export const createOrderSchema = z.object({
   promoCode: z.string().trim().optional().default(''),
   deliveryType: z.enum(['CDEK', 'RUSSIAN_POST']),
   paymentMethod: z.enum(['CARD', 'SBP']),
+  // Цену и название клиент НЕ присылает: сервер берёт их из каталога по productId
+  // (см. routes/orders.js). Иначе любой мог бы оформить заказ по цене в 1 рубль,
+  // просто отправив запрос к API в обход формы.
   items: z
     .array(
       z.object({
-        productId: z.number().int().optional().nullable(),
-        name: z.string().trim().min(1),
-        size: z.string().trim().optional().nullable(),
-        price: z.number().int().positive(),
-        qty: z.number().int().positive(),
+        productId: z.number().int().positive(),
+        size: z.enum(['S', 'M', 'L', 'XL']).optional().nullable(),
+        qty: z.number().int().positive().max(20, 'Не больше 20 штук одной позиции'),
       })
     )
-    .min(1, 'Корзина пуста'),
+    .min(1, 'Корзина пуста')
+    .max(30, 'Слишком много позиций в заказе'),
 });

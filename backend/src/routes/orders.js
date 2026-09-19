@@ -4,6 +4,7 @@ import { prisma } from '../lib/prisma.js';
 import { asyncHandler } from '../middleware/asyncHandler.js';
 import { HttpError } from '../middleware/errorHandler.js';
 import { createOrderSchema } from '../schemas/order.js';
+import { getDiscountedPrice } from '../lib/pricing.js';
 import { notifyTelegramNewOrder } from '../lib/telegram.js';
 import { notifyEmailNewOrder } from '../lib/email.js';
 
@@ -24,7 +25,28 @@ ordersRouter.post(
   asyncHandler(async (req, res) => {
     const data = createOrderSchema.parse(req.body);
 
-    const totalPrice = data.items.reduce((sum, i) => sum + i.price * i.qty, 0);
+    // Цены считаем на сервере по актуальному каталогу — цифрам от клиента не доверяем.
+    const productIds = [...new Set(data.items.map((i) => i.productId))];
+    const products = await prisma.product.findMany({
+      where: { id: { in: productIds }, isActive: true },
+    });
+    const productById = new Map(products.map((p) => [p.id, p]));
+
+    const items = data.items.map((i) => {
+      const product = productById.get(i.productId);
+      if (!product) {
+        throw new HttpError(400, 'Один из товаров в корзине больше недоступен. Обновите корзину');
+      }
+      return {
+        productId: product.id,
+        name: product.name,
+        size: i.size ?? null,
+        price: getDiscountedPrice(product.price, product.discountPercent),
+        qty: i.qty,
+      };
+    });
+
+    const totalPrice = items.reduce((sum, i) => sum + i.price * i.qty, 0);
 
     const order = await prisma.order.create({
       data: {
@@ -42,15 +64,7 @@ ordersRouter.post(
         deliveryType: data.deliveryType,
         paymentMethod: data.paymentMethod,
         totalPrice,
-        items: {
-          create: data.items.map((i) => ({
-            productId: i.productId ?? null,
-            name: i.name,
-            size: i.size ?? null,
-            price: i.price,
-            qty: i.qty,
-          })),
-        },
+        items: { create: items },
       },
       include: { items: true },
     });

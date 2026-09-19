@@ -1,8 +1,21 @@
 import 'dotenv/config';
-import bcrypt from 'bcryptjs';
 import { PrismaClient } from '@prisma/client';
+import { assertStrongPassword, hashPassword } from '../src/lib/password.js';
 
 const prisma = new PrismaClient();
+
+// Учётные данные админа обязательны и без значений по умолчанию: пароль «по умолчанию»
+// в открытом репозитории — это, по сути, публичный пароль от админки.
+function readAdminCredentials() {
+  const email = (process.env.SEED_ADMIN_EMAIL || '').trim().toLowerCase();
+  const password = process.env.SEED_ADMIN_PASSWORD || '';
+
+  if (!email) {
+    throw new Error('Задай SEED_ADMIN_EMAIL (email админа)');
+  }
+  assertStrongPassword(password); // бросит понятную ошибку, если пароль слабый или не задан
+  return { email, password };
+}
 
 // Переносим то, что сейчас захардкожено в homeProducts.js / saleItems.js /
 // tshirtItems.js / archiveItems.js / collectionItems.js на фронте, чтобы после
@@ -50,6 +63,9 @@ const PRODUCTS = [
 ];
 
 async function main() {
+  // Проверяем креды ДО любых записей в БД — чтобы не получить полузасеянную базу.
+  const { email: adminEmail, password: adminPassword } = readAdminCredentials();
+
   console.log('Создаю коллекции...');
   const collectionBySlug = {};
   for (const c of COLLECTIONS) {
@@ -74,23 +90,26 @@ async function main() {
     });
   }
 
-  const adminEmail = process.env.SEED_ADMIN_EMAIL || 'admin@legashion.ru';
-  const adminPassword = process.env.SEED_ADMIN_PASSWORD || 'changeme123';
-  const passwordHash = await bcrypt.hash(adminPassword, 10);
-
-  await prisma.admin.upsert({
-    where: { email: adminEmail },
-    update: {},
-    create: { email: adminEmail, passwordHash },
+  const existing = await prisma.admin.findFirst({
+    where: { email: { equals: adminEmail, mode: 'insensitive' } },
   });
-  console.log(`Админ готов: ${adminEmail} / ${adminPassword} (смени пароль после первого входа!)`);
+  if (existing) {
+    // Сид намеренно не перезаписывает пароль существующего админа.
+    // Сменить пароль: npm run admin:set-password
+    console.log(`Админ ${existing.email} уже существует — пароль не менялся.`);
+  } else {
+    await prisma.admin.create({
+      data: { email: adminEmail, passwordHash: await hashPassword(adminPassword) },
+    });
+    console.log(`Админ создан: ${adminEmail}`);
+  }
 
   console.log('Готово.');
 }
 
 main()
   .catch((e) => {
-    console.error(e);
+    console.error(e.message || e);
     process.exit(1);
   })
   .finally(() => prisma.$disconnect());

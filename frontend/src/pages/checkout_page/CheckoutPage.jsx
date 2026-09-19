@@ -143,7 +143,8 @@ export default function CheckoutPage() {
         promoCode: details.promoCode,
         deliveryType: DELIVERY_TYPE_TO_API[deliveryType] ?? 'CDEK',
         paymentMethod: PAYMENT_METHOD_TO_API[paymentMethod] ?? 'CARD',
-        items: items.map((i) => ({ name: i.name, size: i.size ?? null, price: i.price, qty: i.qty })),
+        // Цену не отправляем: бэкенд считает её сам по productId (иначе её можно подделать).
+        items: items.map((i) => ({ productId: i.productId, size: i.size ?? null, qty: i.qty })),
       });
 
       clearCart();

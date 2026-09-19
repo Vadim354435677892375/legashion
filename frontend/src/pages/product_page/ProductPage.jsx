@@ -60,6 +60,7 @@ export default function ProductPage() {
 
     addItem({
       id: `${product.id}-${size}`,
+      productId: product.id, // по нему бэкенд сам берёт актуальную цену при оформлении заказа
       name: product.name,
       size,
       price: finalPrice,

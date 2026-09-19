@@ -21,6 +21,19 @@ model Admin {
   createdAt    DateTime @default(now())
 }
 
+// Неудачные попытки входа в админку — по ним считаем лимит (см. routes/admin/auth.js).
+// Хранится в БД, а не в памяти процесса: на Vercel каждый запрос может попасть в
+// новый инстанс, и счётчик в памяти просто не работал бы.
+model LoginAttempt {
+  id        Int      @id @default(autoincrement())
+  email     String
+  ip        String
+  createdAt DateTime @default(now())
+
+  @@index([ip, createdAt])
+  @@index([email, createdAt])
+}
+
 model Collection {
   id        Int                 @id @default(autoincrement())
   slug      String              @unique // 'home' | 'sale' | 'archive' | 'tshirts' | 'new-collection' | ...

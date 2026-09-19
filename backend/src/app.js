@@ -1,4 +1,5 @@
 import express from 'express';
+import helmet from 'helmet';
 import 'dotenv/config';
 
 import { productsRouter } from './routes/products.js';
@@ -12,20 +13,48 @@ import { adminOrdersRouter } from './routes/admin/orders.js';
 import { adminUploadRouter } from './routes/admin/upload.js';
 import { requireAdmin } from './middleware/adminAuth.js';
 import { errorHandler } from './middleware/errorHandler.js';
+import { assertJwtConfig } from './lib/jwt.js';
 
 const allowedOrigins = (process.env.CORS_ORIGIN || '')
   .split(',')
   .map((s) => s.trim())
   .filter(Boolean);
 
+const isProduction = process.env.NODE_ENV === 'production';
+
+// Локально (CORS_ORIGIN пуст) пускаем любой origin, чтобы не мучиться с настройкой.
+// В проде пустой список НЕ означает «всем можно»: без явного списка CORS выключен.
+if (isProduction && allowedOrigins.length === 0) {
+  console.error('[cors] CORS_ORIGIN не задан — в продакшене cross-origin запросы будут отклонены');
+}
+
+// В serverless-режиме на Vercel сервер не «стартует», поэтому проверку секрета из server.js
+// там не выполнить — логируем проблему при загрузке модуля, чтобы она была видна в логах.
+// Сам запрос к админке при этом всё равно упадёт безопасно (500), см. middleware/adminAuth.js.
+try {
+  assertJwtConfig();
+} catch (err) {
+  console.error('[jwt]', err.message);
+}
+
 export const app = express();
+
+// Бэкенд стоит за прокси Vercel — без этого req.ip был бы адресом прокси, а не клиента,
+// и лимит попыток входа считался бы на всех сразу. Значение 1 = доверяем ровно одному прокси.
+app.set('trust proxy', 1);
+
+// Базовые защитные заголовки (X-Content-Type-Options, HSTS, скрытие X-Powered-By и т.д.).
+// Это чистый JSON-API, поэтому CORP ставим cross-origin — иначе фронт на другом домене
+// не сможет забирать ответы.
+app.use(helmet({ crossOriginResourcePolicy: { policy: 'cross-origin' } }));
 
 app.use((req, res, next) => {
   // Ставим CORS-заголовки вручную, а не через пакет `cors`: в связке с
   // авто-определением Express-фреймворка на Vercel заголовки из `cors()`
   // почему-то не долетали до браузера. Ручная установка — надёжнее.
   const origin = req.headers.origin;
-  const isAllowed = allowedOrigins.length === 0 || (origin && allowedOrigins.includes(origin));
+  const isAllowed =
+    allowedOrigins.length === 0 ? !isProduction : Boolean(origin && allowedOrigins.includes(origin));
 
   if (isAllowed && origin) {
     res.setHeader('Access-Control-Allow-Origin', origin);
