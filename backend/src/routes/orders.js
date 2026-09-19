@@ -70,9 +70,23 @@ ordersRouter.post(
     });
 
     // Уведомления не должны валить успешный ответ клиенту, если, скажем,
-    // Telegram недоступен — поэтому не await-им их последовательно с падением всего запроса,
-    // а гасим ошибки каждого канала по отдельности.
-    await Promise.allSettled([notifyTelegramNewOrder(order), notifyEmailNewOrder(order)]);
+    // Telegram недоступен — поэтому каналы шлются параллельно и ошибка одного
+    // не влияет ни на второй, ни на ответ. await обязателен: на Vercel функция
+    // «замораживается» сразу после ответа, и неоконченная отправка потерялась бы.
+    // Ошибки не глотаем молча, а пишем в лог — иначе непонятно, почему нет сообщения.
+    const channels = ['telegram', 'email'];
+    const results = await Promise.allSettled([
+      notifyTelegramNewOrder(order),
+      notifyEmailNewOrder(order),
+    ]);
+    results.forEach((result, idx) => {
+      if (result.status === 'rejected') {
+        console.error(
+          `[orders] уведомление (${channels[idx]}) о заказе ${order.orderNumber} не отправлено:`,
+          result.reason?.message ?? result.reason
+        );
+      }
+    });
 
     res.status(201).json({
       orderNumber: order.orderNumber,

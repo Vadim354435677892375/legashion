@@ -1,4 +1,4 @@
-import { describe, it, before, after, beforeEach } from 'node:test';
+import { describe, it, before, after, beforeEach, afterEach, mock } from 'node:test';
 import assert from 'node:assert/strict';
 import { loadApp } from './helpers.js';
 
@@ -85,5 +85,49 @@ describe('POST /api/orders — цены считает сервер', () => {
   it('слишком много позиций → 400', async () => {
     const items = Array.from({ length: 31 }, () => ({ productId: 1, size: 'M', qty: 1 }));
     assert.equal((await send(baseOrder(items))).status, 400);
+  });
+});
+
+describe('POST /api/orders — уведомления', () => {
+  const realFetch = globalThis.fetch;
+  const isTelegram = (url) => String(url).startsWith('https://api.telegram.org');
+
+  beforeEach(() => {
+    process.env.TELEGRAM_BOT_TOKEN = 'TOKEN';
+    process.env.TELEGRAM_CHAT_ID = '1';
+  });
+  afterEach(() => {
+    delete process.env.TELEGRAM_BOT_TOKEN;
+    delete process.env.TELEGRAM_CHAT_ID;
+    mock.restoreAll();
+  });
+
+  it('после создания заказа шлёт сообщение в Telegram с номером заказа', async () => {
+    const fetchMock = mock.method(globalThis, 'fetch', (url, opts) =>
+      isTelegram(url) ? Promise.resolve(new Response('{"ok":true}')) : realFetch(url, opts)
+    );
+
+    const res = await send(baseOrder([{ productId: 1, size: 'M', qty: 1 }]));
+    const { orderNumber } = await res.json();
+
+    const tgCalls = fetchMock.mock.calls.filter((c) => isTelegram(c.arguments[0]));
+    assert.equal(tgCalls.length, 1);
+    assert.match(JSON.parse(tgCalls[0].arguments[1].body).text, new RegExp(orderNumber));
+  });
+
+  it('сбой Telegram не ломает оформление заказа и попадает в лог', async () => {
+    mock.method(globalThis, 'fetch', (url, opts) =>
+      isTelegram(url) ? Promise.reject(new Error('network down')) : realFetch(url, opts)
+    );
+    const errorLog = mock.method(console, 'error', () => {});
+
+    const res = await send(baseOrder([{ productId: 1, size: 'M', qty: 1 }]));
+
+    assert.equal(res.status, 201);
+    assert.equal(ctx.prisma._db.orders.length, 1);
+    assert.ok(
+      errorLog.mock.calls.some((c) => String(c.arguments[0]).includes('telegram')),
+      'ошибка отправки должна быть залогирована'
+    );
   });
 });

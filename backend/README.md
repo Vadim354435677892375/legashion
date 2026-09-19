@@ -93,6 +93,28 @@ backend/
     seed.js                  — начальные данные
 ```
 
+## Уведомления о заказах (Telegram + email)
+
+При каждом `POST /api/orders` бэкенд после сохранения заказа отправляет сообщение
+в Telegram и письмо администратору. Каналы независимы: если один не настроен или
+упал, заказ всё равно оформляется, а причина пишется в лог
+(`[orders] уведомление (telegram|email) ... не отправлено`).
+
+**Telegram**
+1. Создай бота у [@BotFather](https://t.me/BotFather) (`/newbot`) → токен в `TELEGRAM_BOT_TOKEN`.
+2. Напиши боту любое сообщение (для группы/канала — добавь бота и дай право писать).
+3. Узнай chat id: открой `https://api.telegram.org/bot<TOKEN>/getUpdates` и найди `chat.id`
+   (у групп и каналов он отрицательный, например `-1001234567890`) → `TELEGRAM_CHAT_ID`.
+
+**Email (SMTP)**
+- Заполни `SMTP_HOST`, `SMTP_PORT`, `SMTP_SECURE`, `SMTP_USER`, `SMTP_PASS`.
+  Для Яндекса/Gmail нужен **пароль приложения**, а не основной пароль от ящика.
+- `ADMIN_EMAIL` — куда слать; можно несколько адресов через запятую.
+- Порт 465 → `SMTP_SECURE=true`, порт 587 → `SMTP_SECURE=false`.
+
+На Vercel переменные задаются в Settings → Environment Variables; после
+изменения нужен redeploy.
+
 ## Основные эндпоинты
 
 Публичные:
