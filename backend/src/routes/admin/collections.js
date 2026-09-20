@@ -3,6 +3,7 @@ import { z } from 'zod';
 import { prisma } from '../../lib/prisma.js';
 import { asyncHandler } from '../../middleware/asyncHandler.js';
 import { HttpError } from '../../middleware/errorHandler.js';
+import { hasVideoBanner } from '../../lib/mediaSlots.js';
 
 export const adminCollectionsRouter = Router();
 
@@ -23,7 +24,9 @@ adminCollectionsRouter.get(
       include: { _count: { select: { products: true } } },
       orderBy: { id: 'asc' },
     });
-    res.json(collections);
+    // Поля bannerVideoUrl/bannerPosterUrl уже в строке коллекции; hasVideoBanner говорит
+    // админке, есть ли у страницы этой коллекции видео-баннер (у Sale/Archive/Футболок — нет).
+    res.json(collections.map((c) => ({ ...c, hasVideoBanner: hasVideoBanner(c.slug) })));
   })
 );
 

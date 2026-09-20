@@ -120,6 +120,26 @@ describe('слоты-картинки', () => {
     assert.equal(slots.find((s) => s.key === 'models.look-1').url, url);
   });
 
+  it('слоты коллекций несут slug коллекции, остальные остаются на вкладке «Медиа»', async () => {
+    const body = await (await api('/api/admin/site-media')).json();
+    assert.equal('collections' in body, false);
+    const collectionOf = Object.fromEntries(body.slots.map((s) => [s.key, s.collection ?? null]));
+
+    assert.equal(collectionOf['categories.archive'], 'archive');
+    assert.equal(collectionOf['categories.sale'], 'sale');
+    assert.equal(collectionOf['categories.tshirts'], 'tshirts');
+    assert.equal(collectionOf['categories.new-collection'], 'new-collection');
+    assert.equal(collectionOf['tshirts.hero'], 'tshirts');
+    for (const n of [1, 2, 3, 4]) assert.equal(collectionOf[`archive.banner-${n}`], 'archive');
+
+    // не привязанные к коллекции — остаются в «Медиа»
+    for (const key of ['intro.background', 'brand.logo', 'categories.longsleeves', 'models.look-1']) {
+      assert.equal(collectionOf[key], null, key);
+    }
+    // у каждого привязанного слота есть подпись для формы коллекции
+    assert.ok(body.slots.filter((s) => s.collection).every((s) => s.collectionLabel));
+  });
+
   it('неизвестный слот → 404', async () => {
     const res = await api('/api/admin/site-media/slots/nope.nothing', {
       method: 'PUT',
@@ -276,9 +296,29 @@ describe('промо-видео коллекции', () => {
   const setBanner = (id, body) =>
     api(`/api/admin/site-media/collections/${id}/banner`, { method: 'PUT', body });
 
-  it('в списке админки только коллекции с видео-баннером (без sale/archive/…)', async () => {
-    const { collections } = await (await api('/api/admin/site-media')).json();
-    assert.deepEqual(collections.map((c) => c.slug), ['new-collection']);
+  it('список коллекций в админке содержит поля видео и флаг hasVideoBanner (у sale его нет)', async () => {
+    const list = await (await api('/api/admin/collections')).json();
+    const bySlug = Object.fromEntries(list.map((c) => [c.slug, c]));
+    assert.equal(bySlug['new-collection'].hasVideoBanner, true);
+    assert.equal(bySlug.sale.hasVideoBanner, false);
+
+    await setBanner(101, { videoUrl: file('v.mp4'), posterUrl: file('p.jpg') });
+    const after = (await (await api('/api/admin/collections')).json()).find((c) => c.slug === 'new-collection');
+    assert.equal(after.bannerVideoUrl, file('v.mp4'));
+    assert.equal(after.bannerPosterUrl, file('p.jpg'));
+  });
+
+  it('произвольная новая коллекция тоже получает видео-баннер', async () => {
+    ctx.prisma._db.collections.push({ id: 103, slug: 'winter-2026', title: 'WINTER', marquee: null, bannerVideoUrl: null, bannerPosterUrl: null });
+    const list = await (await api('/api/admin/collections')).json();
+    assert.equal(list.find((c) => c.slug === 'winter-2026').hasVideoBanner, true);
+  });
+
+  it('публичный API коллекции отдаёт видео и постер для страницы', async () => {
+    await setBanner(101, { videoUrl: file('v.mp4'), posterUrl: null });
+    const pub = await (await api('/api/collections/new-collection', { auth: false })).json();
+    assert.equal(pub.bannerVideoUrl, file('v.mp4'));
+    assert.equal(pub.bannerPosterUrl, null);
   });
 
   it('видео и постер сохраняются, замена удаляет старые файлы, null очищает', async () => {

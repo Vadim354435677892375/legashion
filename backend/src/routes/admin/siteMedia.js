@@ -1,11 +1,7 @@
 import { Router } from 'express';
 import { prisma } from '../../lib/prisma.js';
 import { deleteMediaByUrl } from '../../lib/s3.js';
-import {
-  COLLECTIONS_WITHOUT_VIDEO_BANNER,
-  MEDIA_SLOTS,
-  SLOT_KEYS,
-} from '../../lib/mediaSlots.js';
+import { MEDIA_SLOTS, SLOT_KEYS } from '../../lib/mediaSlots.js';
 import { asyncHandler } from '../../middleware/asyncHandler.js';
 import { HttpError } from '../../middleware/errorHandler.js';
 import { bannerSchema, slotSchema, trackOrderSchema, trackSchema } from '../../schemas/media.js';
@@ -24,15 +20,15 @@ function parseId(raw, what) {
   return id;
 }
 
-// Всё для вкладки «Медиа» одним ответом: слоты с их текущим значением,
-// плейлист плеера и коллекции с промо-видео.
+// Слоты с их текущим значением и плейлист плеера. Слоты, привязанные к коллекции
+// (поле collection), админка показывает в форме коллекции, остальные — на вкладке «Медиа».
+// Промо-видео коллекций отдаёт GET /api/admin/collections (поля bannerVideoUrl/bannerPosterUrl).
 adminSiteMediaRouter.get(
   '/',
   asyncHandler(async (req, res) => {
-    const [rows, tracks, collections] = await Promise.all([
+    const [rows, tracks] = await Promise.all([
       prisma.siteMedia.findMany(),
       prisma.playerTrack.findMany({ orderBy: trackOrderBy }),
-      prisma.collection.findMany({ orderBy: { id: 'asc' } }),
     ]);
     const byKey = new Map(rows.map((row) => [row.key, row]));
 
@@ -43,15 +39,6 @@ adminSiteMediaRouter.get(
         updatedAt: byKey.get(slot.key)?.updatedAt ?? null,
       })),
       tracks,
-      collections: collections
-        .filter((c) => !COLLECTIONS_WITHOUT_VIDEO_BANNER.includes(c.slug))
-        .map((c) => ({
-          id: c.id,
-          slug: c.slug,
-          title: c.title,
-          bannerVideoUrl: c.bannerVideoUrl,
-          bannerPosterUrl: c.bannerPosterUrl,
-        })),
     });
   })
 );
