@@ -1,9 +1,10 @@
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import './ArchivePage.css';
-import logo from '../../assets/logo-glitch.gif';
+import defaultLogo from '../../assets/logo-glitch.gif';
 import CartButton from '../../components/CartButton';
 import { useProducts } from '../../hooks/useProducts';
+import { useSiteMedia } from '../../hooks/useSiteMedia';
 import { formatPrice } from '../../utils/pricing';
 
 // Страница коллекции «Archive» — отдельная страница в файловой системе,
@@ -12,17 +13,17 @@ import { formatPrice } from '../../utils/pricing';
 // Товары приходят с бэкенда (GET /api/products?collection=archive), заменяя
 // прежний захардкоженный archiveItems.js.
 
-// Число слайдов в баннере-карусели. Пока фото нет — слайды пустые серые
-// плейсхолдеры; когда появятся фото архива, сюда нужно будет передать
-// реальный список image-путей вместо slideCount.
-const BANNER_SLIDE_COUNT = 4;
+// Слайды баннера-карусели. Фото загружаются в админке (Медиа → «Страница Archive»);
+// слайд без фото остаётся серым плейсхолдером. Ключи слотов — backend/src/lib/mediaSlots.js.
+const BANNER_SLOT_KEYS = ['archive.banner-1', 'archive.banner-2', 'archive.banner-3', 'archive.banner-4'];
 
 // Баннер-карусель: стрелки листают слайды, точки под баннером показывают
-// текущий слайд и позволяют перейти напрямую. Фото пока нет — вместо них
-// пустые серые плейсхолдеры.
-function BannerCarousel({ slideCount }) {
+// текущий слайд и позволяют перейти напрямую.
+function BannerCarousel() {
   const [index, setIndex] = useState(0);
-  const slides = Array.from({ length: slideCount }, (_, i) => i);
+  const media = useSiteMedia();
+  const slideCount = BANNER_SLOT_KEYS.length;
+  const slides = BANNER_SLOT_KEYS.map((key, i) => ({ i, image: media.get(key) }));
 
   const prev = () => setIndex((i) => (i - 1 + slideCount) % slideCount);
   const next = () => setIndex((i) => (i + 1) % slideCount);
@@ -40,11 +41,14 @@ function BannerCarousel({ slideCount }) {
         </button>
 
         <div className="archive-carousel-viewport">
-          {slides.map((i) => (
+          {slides.map(({ i, image }) => (
             <div
               key={i}
               className="archive-carousel-slide"
-              style={{ transform: `translateX(${(i - index) * 100}%)` }}
+              style={{
+                transform: `translateX(${(i - index) * 100}%)`,
+                ...(image ? { backgroundImage: `url(${image})` } : {}),
+              }}
             />
           ))}
         </div>
@@ -60,7 +64,7 @@ function BannerCarousel({ slideCount }) {
       </div>
 
       <div className="archive-carousel-dots">
-        {slides.map((i) => (
+        {slides.map(({ i }) => (
           <button
             key={i}
             type="button"
@@ -76,6 +80,8 @@ function BannerCarousel({ slideCount }) {
 
 export default function ArchivePage() {
   const { products, loading, error } = useProducts('archive');
+  const media = useSiteMedia();
+  const logo = media.get('brand.logo', defaultLogo);
 
   return (
     <div className="archive-page">
@@ -85,12 +91,12 @@ export default function ArchivePage() {
 
       <header className="archive-header">
         <div className="archive-logo">
-          <img src={logo} alt="LEGASHION" />
+          {logo && <img src={logo} alt="LEGASHION" />}
         </div>
         <h1 className="archive-title">ARCHIVE</h1>
       </header>
 
-      <BannerCarousel slideCount={BANNER_SLIDE_COUNT} />
+      <BannerCarousel />
 
       {error && <p className="archive-error">Не удалось загрузить товары</p>}
 

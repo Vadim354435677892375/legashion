@@ -483,3 +483,200 @@
     padding: 16px;
   }
 }
+/* --- Вкладка «Медиа» --- */
+
+.admin-media-group {
+  margin-top: 28px;
+}
+
+.admin-media-group h3 {
+  font-size: 16px;
+  margin-bottom: 10px;
+}
+
+.admin-media-group > .admin-muted {
+  margin-bottom: 12px;
+  max-width: 760px;
+}
+
+.admin-media-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+  gap: 12px;
+}
+
+.admin-media-grid-wide {
+  grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
+}
+
+.admin-media-card {
+  display: flex;
+  gap: 12px;
+  padding: 10px;
+  background: #fff;
+  border: 1px solid #e4e4e7;
+  border-radius: 12px;
+}
+
+.admin-media-card-wide {
+  flex-direction: column;
+}
+
+.admin-media-thumb {
+  flex: 0 0 84px;
+  height: 84px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  background: #e4e4e7;
+  border-radius: 8px;
+  overflow: hidden;
+  font-size: 12px;
+}
+
+.admin-media-thumb .admin-muted {
+  font-size: 11px;
+  padding: 0 4px;
+}
+
+.admin-media-thumb img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.admin-media-thumb-video {
+  flex-basis: auto;
+  width: 100%;
+  height: auto;
+  aspect-ratio: 16 / 9;
+}
+
+.admin-media-thumb-video video {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  background: #000;
+}
+
+.admin-media-body {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  min-width: 0;
+  flex: 1;
+}
+
+.admin-media-hint {
+  color: #71717a;
+  font-size: 12px;
+}
+
+.admin-media-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-top: auto;
+}
+
+/* Кнопка выбора файла: label, оформленный как обычная кнопка админки */
+.admin-page .admin-upload {
+  display: inline-flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 0;
+  padding: 8px 14px;
+  background: #fff;
+  border: 1px solid #d4d4d8;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 14px;
+  white-space: nowrap;
+}
+
+.admin-page .admin-upload:hover:not(.is-disabled) {
+  background: #f4f4f5;
+}
+
+.admin-page .admin-upload.is-disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.admin-page .admin-upload-primary {
+  background: #18181b;
+  border-color: #18181b;
+  color: #fff;
+}
+
+.admin-page .admin-upload-primary:hover:not(.is-disabled) {
+  background: #3f3f46;
+}
+
+.admin-page .admin-upload input {
+  display: none;
+}
+
+/* Плейлист плеера */
+
+.admin-tracks {
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin-bottom: 12px;
+}
+
+.admin-track {
+  display: flex;
+  gap: 12px;
+  align-items: flex-start;
+  padding: 10px;
+  background: #fff;
+  border: 1px solid #e4e4e7;
+  border-radius: 12px;
+}
+
+.admin-track-video {
+  flex: 0 0 200px;
+  width: 200px;
+  aspect-ratio: 16 / 9;
+  background: #000;
+  border-radius: 8px;
+  object-fit: contain;
+}
+
+.admin-track-main {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  flex: 1;
+  min-width: 0;
+}
+
+.admin-track-title {
+  display: flex;
+  gap: 8px;
+}
+
+.admin-track-side {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+@media (max-width: 720px) {
+  .admin-track {
+    flex-direction: column;
+  }
+
+  .admin-track-video {
+    flex-basis: auto;
+    width: 100%;
+  }
+
+  .admin-track-side {
+    flex-direction: row;
+  }
+}

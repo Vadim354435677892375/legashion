@@ -144,6 +144,42 @@
   text-transform: uppercase;
 }
 
+/* настоящее видео из плейлиста (загружается в админке) */
+.wmp-video {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  background: #000;
+  cursor: pointer;
+}
+
+/* кнопка play поверх поставленного на паузу видео; клики мимо круга уходят в <video> */
+.wmp-video-overlay {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  pointer-events: none;
+}
+
+.wmp-video-overlay .wmp-play-circle {
+  pointer-events: auto;
+}
+
+/* заглушка, пока в плейлисте нет роликов: круг не кликабелен */
+.wmp-play-circle--idle {
+  cursor: default;
+}
+
+.wmp-round-btn:disabled,
+.wmp-range:disabled {
+  opacity: 0.5;
+  cursor: default;
+}
+
 /* обычный гладкий круг с иконкой play/pause */
 .wmp-play-circle {
   width: 64px;

@@ -3,6 +3,7 @@ import './AdminPage.css';
 import ProductsTab from './blocks/ProductsTab';
 import CollectionsTab from './blocks/CollectionsTab';
 import OrdersTab from './blocks/OrdersTab';
+import MediaTab from './blocks/MediaTab';
 import {
   adminLogin,
   adminLogout,
@@ -21,6 +22,7 @@ import {
 const TABS = [
   { id: 'products', label: 'Товары' },
   { id: 'collections', label: 'Коллекции' },
+  { id: 'media', label: 'Медиа' },
   { id: 'orders', label: 'Заказы' },
 ];
 
@@ -168,6 +170,7 @@ export default function AdminPage() {
       <main className="admin-content">
         {tab === 'products' && <ProductsTab />}
         {tab === 'collections' && <CollectionsTab />}
+        {tab === 'media' && <MediaTab />}
         {tab === 'orders' && <OrdersTab />}
       </main>
     </div>

@@ -65,6 +65,49 @@ npm run admin:set-password -- you@example.com # email из аргумента
 - **CORS**: в продакшене работает только для origin из `CORS_ORIGIN`.
 - Не сделано (осознанно, на потом): двухфакторная аутентификация.
 
+## Медиа сайта (картинки, видео, постеры)
+
+Админка → вкладка **«Медиа»** позволяет менять всё, что раньше было зашито в код:
+заставку (фон и логотип), карточки категорий, фото моделей, фото на странице «Футболки»,
+слайды баннера Archive, плейлист видеоплеера на главной и промо-видео на страницах коллекций.
+Фото товаров по-прежнему правятся в карточке товара.
+
+**Как это устроено**
+- Список «мест» для картинок (слотов) — в `src/lib/mediaSlots.js`. В БД (`SiteMedia`) лежат только
+  замены; нет замены — сайт показывает встроенную картинку из `frontend/src/assets` или серый
+  плейсхолдер. Кнопка «Сбросить» в админке удаляет замену.
+- Плейлист плеера — таблица `PlayerTrack`; промо-видео коллекции — поля `bannerVideoUrl` /
+  `bannerPosterUrl` у `Collection`.
+- Публично: `GET /api/site-media` (замены слотов + плейлист); видео коллекции приходит в
+  `GET /api/collections/:slug`. Админ: `/api/admin/site-media/*`.
+- Загрузка идёт **напрямую из браузера в бакет** по подписанной ссылке
+  (`POST /api/admin/upload/presign` → `PUT` в бакет), а не через сервер: у serverless-функции на
+  Vercel лимит на тело запроса ~4,5 МБ, видео через неё не пройдёт. Форматы: JPG, PNG, GIF, WebP,
+  AVIF (до 20 МБ), MP4, WebM (до 200 МБ). Принимаются только ссылки на файлы из нашего бакета.
+  Заменённые и удалённые файлы стираются из папки `media/` бакета.
+
+**Что нужно настроить один раз: CORS у бакета.** Без этого браузер заблокирует загрузку, и в
+админке будет ошибка «Не удалось загрузить файл в хранилище… CORS». В Yandex Cloud: бакет →
+«CORS» (или `yc storage bucket update --name <бакет> --cors ...`), правило:
+
+```json
+[
+  {
+    "AllowedOrigins": ["https://legashion-one.vercel.app", "http://localhost:5173"],
+    "AllowedMethods": ["PUT"],
+    "AllowedHeaders": ["*"],
+    "MaxAgeSeconds": 3600
+  }
+]
+```
+
+В `AllowedOrigins` — адреса фронтенда (прод и, если нужно, локальный). Читать файлы (для
+`<img>`/`<video>`) CORS не требуется, но бакет должен отдавать объекты публично, как и для фото
+товаров.
+
+**Миграция:** `npm run prisma:migrate:deploy` (добавляет таблицы `SiteMedia`, `PlayerTrack` и
+две колонки в `Collection`).
+
 ## Тесты
 
 ```bash
@@ -86,7 +129,7 @@ backend/
     middleware/           — JWT-проверка админа, error handler, async-обёртка
     lib/jwt.js, password.js — токены админа и правила паролей; pricing.js — цена со скидкой
     routes/                — публичные роуты (products, collections, orders, geocode)
-    routes/admin/           — защищённые роуты админки (auth, products, collections, orders, upload)
+    routes/admin/           — защищённые роуты админки (auth, products, collections, orders, upload, site-media)
     schemas/                — zod-схемы валидации входных данных
   prisma/
     schema.prisma           — модель БД

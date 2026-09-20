@@ -1,9 +1,10 @@
 import { Link, useParams } from 'react-router-dom';
 import './CollectionPage.css';
-import logo from '../../assets/logo-glitch.gif';
+import defaultLogo from '../../assets/logo-glitch.gif';
 import CartButton from '../../components/CartButton';
 import { useCollection } from '../../hooks/useCollection';
 import { useProducts } from '../../hooks/useProducts';
+import { useSiteMedia } from '../../hooks/useSiteMedia';
 import { formatPrice } from '../../utils/pricing';
 
 // Страница отдельной коллекции (открывается по клику на карточку в блоке
@@ -34,6 +35,8 @@ export default function CollectionPage() {
   const { slug = 'new-collection' } = useParams();
   const { collection } = useCollection(slug);
   const { products, loading, error } = useProducts(slug);
+  const media = useSiteMedia();
+  const logo = media.get('brand.logo', defaultLogo);
 
   const title = collection?.title ?? FALLBACK_TITLE;
   const marquee = collection?.marquee ?? title;
@@ -46,7 +49,7 @@ export default function CollectionPage() {
 
       <header className="collection-header">
         <div className="collection-logo">
-          <img src={logo} alt="LEGASHION" />
+          {logo && <img src={logo} alt="LEGASHION" />}
         </div>
         <h1 className="collection-title">{title}</h1>
       </header>
@@ -54,10 +57,22 @@ export default function CollectionPage() {
       <MarqueeBar text={marquee} />
 
       <div className="collection-banner">
-        <div className="collection-banner-placeholder">
-          <span className="collection-banner-play" />
-          <span className="collection-banner-text">Промо-видео коллекции скоро</span>
-        </div>
+        {collection?.bannerVideoUrl ? (
+          // Промо-видео коллекции загружается в админке: Медиа → «Промо-видео коллекций».
+          <video
+            className="collection-banner-video"
+            src={collection.bannerVideoUrl}
+            poster={collection.bannerPosterUrl ?? undefined}
+            controls
+            playsInline
+            preload="metadata"
+          />
+        ) : (
+          <div className="collection-banner-placeholder">
+            <span className="collection-banner-play" />
+            <span className="collection-banner-text">Промо-видео коллекции скоро</span>
+          </div>
+        )}
       </div>
 
       <MarqueeBar text={marquee} />

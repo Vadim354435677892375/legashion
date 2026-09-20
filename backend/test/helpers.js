@@ -20,7 +20,15 @@ export async function loadApp({ env = {}, cacheKey = 'default' } = {}) {
     });
   }
   const prisma = sharedPrisma;
-  Object.assign(prisma._db, { admins: [], attempts: [], products: [], orders: [] });
+  Object.assign(prisma._db, {
+    admins: [],
+    attempts: [],
+    products: [],
+    orders: [],
+    siteMedia: [],
+    tracks: [],
+    collections: [],
+  });
 
   // Query-строка нужна, чтобы app.js перечитал process.env (NODE_ENV, CORS_ORIGIN) заново.
   const { app } = await import(`../src/app.js?${cacheKey}`);

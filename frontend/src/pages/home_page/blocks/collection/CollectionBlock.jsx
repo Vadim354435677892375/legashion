@@ -1,26 +1,28 @@
 import { useRef } from 'react';
 import { Link } from 'react-router-dom';
+import { useSiteMedia } from '../../../../hooks/useSiteMedia';
 import './CollectionBlock.css';
 
 // Блок «Категории» — карусель карточек: New Collection / Archive / Sale /
 // Лонгсливы / Футболки.
-// image: путь к реальному фото, когда оно будет готово (например '/assets/new-collection.jpg').
-// Пока фото нет — рисуется серый плейсхолдер.
+// mediaKey: ключ слота с фото карточки — фото загружается в админке (Медиа → «Главная —
+// карточки категорий»). Пока фото не загружено — рисуется серый плейсхолдер.
 // to: прямой путь на отдельную страницу (например /archive) — используется,
 // когда у коллекции своя страница в файловой системе.
 // slug: если указан (и нет to) — карточка ведёт на общую страницу коллекции
 // (/collection/:slug).
 // Если нет ни to, ни slug (страницы пока не готовы) — карточка неактивна ("#").
 const CATEGORIES = [
-  { label: 'New Collection', image: null, slug: 'new-collection' },
-  { label: 'Archive', image: null, to: '/archive' },
-  { label: 'Sale', image: null, to: '/sale' },
-  { label: 'Лонгсливы', image: null, slug: null },
-  { label: 'Футболки', image: null, to: '/tshirts' },
+  { label: 'New Collection', mediaKey: 'categories.new-collection', slug: 'new-collection' },
+  { label: 'Archive', mediaKey: 'categories.archive', to: '/archive' },
+  { label: 'Sale', mediaKey: 'categories.sale', to: '/sale' },
+  { label: 'Лонгсливы', mediaKey: 'categories.longsleeves', slug: null },
+  { label: 'Футболки', mediaKey: 'categories.tshirts', to: '/tshirts' },
 ];
 
 export default function Categories() {
   const trackRef = useRef(null);
+  const media = useSiteMedia();
 
   // Листаем на ширину одной карточки (+ отступ), а не на фиксированный
   // пиксель — так работает одинаково корректно и на десктопе (видно 3
@@ -47,7 +49,8 @@ export default function Categories() {
       </button>
 
       <div className="categories-track" ref={trackRef}>
-        {CATEGORIES.map(({ label, image, slug, to }) => {
+        {CATEGORIES.map(({ label, mediaKey, slug, to }) => {
+          const image = media.get(mediaKey);
           const content = (
             <>
               <div

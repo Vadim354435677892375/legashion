@@ -39,8 +39,33 @@ model Collection {
   slug      String              @unique // 'home' | 'sale' | 'archive' | 'tshirts' | 'new-collection' | ...
   title     String // заголовок страницы коллекции, напр. "NEW COLLECTION"
   marquee   String? // текст бегущей строки на странице коллекции
+  // Промо-видео на странице коллекции (/collection/:slug) и постер к нему.
+  // Загружаются через админку → вкладка «Медиа», URL ведёт в бакет.
+  bannerVideoUrl  String?
+  bannerPosterUrl String?
   createdAt DateTime            @default(now())
   products  ProductCollection[]
+}
+
+// Замена картинок сайта из админки. Список «слотов» (какие картинки вообще бывают)
+// живёт в коде — backend/src/lib/mediaSlots.js; здесь хранятся только переопределения:
+// нет строки для ключа → фронт показывает встроенную картинку по умолчанию.
+model SiteMedia {
+  key       String   @id // напр. 'intro.background', 'models.look-1'
+  url       String
+  updatedAt DateTime @updatedAt
+}
+
+// Ролики в плеере на главной (окно Windows Media Player). Порядок — по position.
+model PlayerTrack {
+  id        Int      @id @default(autoincrement())
+  title     String
+  videoUrl  String
+  posterUrl String?
+  position  Int      @default(0)
+  createdAt DateTime @default(now())
+
+  @@index([position])
 }
 
 model Product {

@@ -4,7 +4,8 @@ import { useCart } from '../../context/CartContext';
 import { DEFAULT_COUNTRY_CODE } from '../../utils/countries';
 import { DEFAULT_PHONE_CODE, PHONE_CODES } from '../../utils/phoneCodes';
 import { apiPost, ApiError } from '../../utils/api';
-import logo from '../../assets/logo-glitch.gif';
+import defaultLogo from '../../assets/logo-glitch.gif';
+import { useSiteMedia } from '../../hooks/useSiteMedia';
 import DeliveryBlock from './blocks/delivery/DeliveryBlock';
 import DetailsForm from './blocks/details-form/DetailsForm';
 import PaymentBlock from './blocks/payment/PaymentBlock';
@@ -43,6 +44,7 @@ const PAYMENT_METHOD_TO_API = { card: 'CARD', sbp: 'SBP' };
 // в Telegram и на почту (см. backend/src/routes/orders.js).
 export default function CheckoutPage() {
   const { items, totalCount, clearCart } = useCart();
+  const logo = useSiteMedia().get('brand.logo', defaultLogo);
   const navigate = useNavigate();
 
   const [deliveryType, setDeliveryType] = useState('cdek');
@@ -163,7 +165,7 @@ export default function CheckoutPage() {
   return (
     <div className="checkout-page">
       <header className="checkout-header">
-        <img className="checkout-logo" src={logo} alt="LEGASHION" />
+        {logo && <img className="checkout-logo" src={logo} alt="LEGASHION" />}
         <div className="checkout-header-text">
           <span className="checkout-header-title">оформление заказа</span>
           <span className="checkout-header-count">

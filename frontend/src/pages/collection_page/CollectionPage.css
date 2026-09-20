@@ -112,6 +112,15 @@
   gap: 14px;
 }
 
+/* Загруженное в админке промо-видео вместо заглушки */
+.collection-banner-video {
+  display: block;
+  width: 100%;
+  max-height: 480px;
+  object-fit: contain;
+  background: #000;
+}
+
 .collection-banner-play {
   width: 56px;
   height: 56px;

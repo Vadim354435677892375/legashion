@@ -1,26 +1,28 @@
 import { useEffect, useRef, useState } from 'react';
+import { useSiteMedia } from '../../../../hooks/useSiteMedia';
 import './Player.css';
 
-// Блок «Плеер» — промо-видео бренда, заглушка в стиле классического Windows Media Player.
-// Все кнопки функциональны (play/pause, перемотка, громкость, плейлист, свернуть/развернуть/закрыть).
-// Когда будет готов видеоролик — заменить .wmp-placeholder на реальный <video> внутри .wmp-screen.
-
-const DURATION = 105; // 01:45, в секундах — пока нет реального видео
-const TRACKS = [
-  'Промо-ролик — тизер',
-  'Промо-ролик — backstage',
-  'Промо-ролик — коллекция',
-];
+// Блок «Плеер» — промо-видео бренда в окне классического Windows Media Player.
+// Плейлист (ролики + постеры) редактируется в админке: Медиа → «Плеер на главной».
+// Пока в плейлисте ничего нет, показывается заглушка «Промо-видео скоро» с неактивными
+// кнопками. Все кнопки работают с настоящим <video>: play/pause, перемотка ±10 с и ползунок,
+// громкость, плейлист (после ролика сам включается следующий), свернуть/развернуть/закрыть.
 
 function formatTime(sec) {
+  if (!Number.isFinite(sec) || sec < 0) return '00:00';
   const m = Math.floor(sec / 60);
   const s = Math.floor(sec % 60);
   return `${String(m).padStart(2, '0')}:${String(s).padStart(2, '0')}`;
 }
 
 export default function Player() {
+  const { playerTracks: tracks } = useSiteMedia();
+  const hasTracks = tracks.length > 0;
+
+  const [track, setTrack] = useState(0);
   const [playing, setPlaying] = useState(false);
-  const [currentTime, setCurrentTime] = useState(12);
+  const [currentTime, setCurrentTime] = useState(0);
+  const [duration, setDuration] = useState(0);
   const [muted, setMuted] = useState(false);
   const [volume, setVolume] = useState(60);
   const [prevVolume, setPrevVolume] = useState(60);
@@ -28,30 +30,42 @@ export default function Player() {
   const [maximized, setMaximized] = useState(false);
   const [closed, setClosed] = useState(false);
   const [showPlaylist, setShowPlaylist] = useState(false);
-  const [track, setTrack] = useState(0);
 
-  const intervalRef = useRef(null);
+  const videoRef = useRef(null);
+  // Что сделать, когда у только что созданного <video> загрузятся метаданные:
+  // начать играть (выбрали ролик из списка / закончился предыдущий) и/или перемотать
+  // туда, где остановились до сворачивания окна.
+  const startPlayingRef = useRef(false);
+  const resumeAtRef = useRef(null);
 
+  // Плейлист могли укоротить в админке — не выходим за его границы.
+  const trackIndex = Math.min(track, Math.max(tracks.length - 1, 0));
+  const current = tracks[trackIndex] ?? null;
+
+  // Громкость применяем императивно: у <video> нет атрибута volume. Эффект срабатывает и после
+  // смены ролика/разворачивания окна, когда <video> создан заново.
   useEffect(() => {
-    if (!playing) return undefined;
-    intervalRef.current = setInterval(() => {
-      setCurrentTime((t) => {
-        if (t + 1 >= DURATION) {
-          setPlaying(false);
-          return DURATION;
-        }
-        return t + 1;
-      });
-    }, 1000);
-    return () => clearInterval(intervalRef.current);
-  }, [playing]);
+    const video = videoRef.current;
+    if (!video) return;
+    video.muted = muted;
+    video.volume = Math.min(1, Math.max(0, volume / 100));
+  }, [muted, volume, current?.id, minimized]);
 
   const togglePlay = () => {
-    if (closed) return;
-    setPlaying((p) => (currentTime >= DURATION ? (setCurrentTime(0), true) : !p));
+    const video = videoRef.current;
+    if (!video) return;
+    if (video.paused) video.play().catch(() => {});
+    else video.pause();
   };
 
-  const handleSeek = (e) => setCurrentTime(Number(e.target.value));
+  const seekTo = (seconds) => {
+    const video = videoRef.current;
+    if (!video) return;
+    const max = Number.isFinite(video.duration) ? video.duration : seconds;
+    const next = Math.min(max, Math.max(0, seconds));
+    video.currentTime = next;
+    setCurrentTime(next);
+  };
 
   const handleVolume = (e) => {
     const v = Number(e.target.value);
@@ -70,15 +84,55 @@ export default function Player() {
     }
   };
 
-  const skip = (delta) => setCurrentTime((t) => Math.min(DURATION, Math.max(0, t + delta)));
-
-  const selectTrack = (i) => {
-    setTrack(i);
+  // Переключение ролика: новый <video> (key={current.id}) создаётся заново, поэтому
+  // сбрасываем счётчики сами, а запуск откладываем до loadedmetadata.
+  const openTrack = (index, { autoplay }) => {
+    // Тот же ролик: <video> не пересоздаётся, поэтому loadedmetadata не придёт — просто
+    // запускаем сначала (иначе флаг автозапуска остался бы висеть до следующей смены ролика).
+    if (index === trackIndex) {
+      setShowPlaylist(false);
+      seekTo(0);
+      if (autoplay) videoRef.current?.play().catch(() => {});
+      return;
+    }
+    startPlayingRef.current = autoplay;
+    resumeAtRef.current = null;
+    setTrack(index);
+    setPlaying(false);
     setCurrentTime(0);
+    setDuration(0);
     setShowPlaylist(false);
   };
 
-  const seekPercent = Math.round((currentTime / DURATION) * 100);
+  const handleMetadata = (e) => {
+    const video = e.currentTarget;
+    setDuration(video.duration);
+    if (resumeAtRef.current !== null) {
+      video.currentTime = resumeAtRef.current;
+      resumeAtRef.current = null;
+    }
+    if (startPlayingRef.current) {
+      startPlayingRef.current = false;
+      video.play().catch(() => {});
+    }
+  };
+
+  const handleEnded = () => {
+    if (trackIndex + 1 < tracks.length) openTrack(trackIndex + 1, { autoplay: true });
+    else setPlaying(false);
+  };
+
+  // Сворачивание убирает <video> из DOM (как и раньше убирало экран) — запоминаем место,
+  // ставим на паузу и при разворачивании возвращаемся на то же место.
+  const toggleMinimized = () => {
+    if (!minimized) {
+      resumeAtRef.current = currentTime;
+      setPlaying(false);
+    }
+    setMinimized((m) => !m);
+  };
+
+  const seekPercent = duration > 0 ? Math.round((currentTime / duration) * 100) : 0;
   const volumePercent = muted ? 0 : volume;
 
   if (closed) {
@@ -93,17 +147,17 @@ export default function Player() {
   return (
     <div className={`wmp${maximized ? ' maximized' : ''}`}>
       <div className="wmp-window">
-        <div className="wmp-titlebar" onDoubleClick={() => setMinimized((m) => !m)}>
+        <div className="wmp-titlebar" onDoubleClick={toggleMinimized}>
           <div className="wmp-title">
             <span className="wmp-icon" />
-            <span>{TRACKS[track]}</span>
+            <span>{current?.title ?? 'Windows Media Player'}</span>
           </div>
           <div className="wmp-winbtns">
             <button
               className="wmp-btn-min"
               aria-label="Свернуть"
               aria-pressed={minimized}
-              onClick={() => setMinimized((m) => !m)}
+              onClick={toggleMinimized}
             />
             <button
               className="wmp-btn-max"
@@ -115,6 +169,7 @@ export default function Player() {
               className="wmp-btn-close"
               aria-label="Закрыть"
               onClick={() => {
+                videoRef.current?.pause();
                 setPlaying(false);
                 setClosed(true);
               }}
@@ -124,24 +179,50 @@ export default function Player() {
 
         {!minimized && (
           <div className="wmp-screen">
-            <div className="wmp-placeholder">
-              <div className={`wmp-play-circle${playing ? ' is-playing' : ''}`} onClick={togglePlay}>
-                {playing ? <span className="wmp-pause-icon" /> : <span className="wmp-play-icon" />}
+            {current ? (
+              <>
+                <video
+                  key={current.id}
+                  ref={videoRef}
+                  className="wmp-video"
+                  src={current.videoUrl}
+                  poster={current.posterUrl ?? undefined}
+                  playsInline
+                  preload="metadata"
+                  onClick={togglePlay}
+                  onPlay={() => setPlaying(true)}
+                  onPause={() => setPlaying(false)}
+                  onEnded={handleEnded}
+                  onLoadedMetadata={handleMetadata}
+                  onDurationChange={(e) => setDuration(e.currentTarget.duration)}
+                  onTimeUpdate={(e) => setCurrentTime(e.currentTarget.currentTime)}
+                />
+                {!playing && (
+                  <div className="wmp-video-overlay">
+                    <div className="wmp-play-circle" onClick={togglePlay}>
+                      <span className="wmp-play-icon" />
+                    </div>
+                  </div>
+                )}
+              </>
+            ) : (
+              <div className="wmp-placeholder">
+                <div className="wmp-play-circle wmp-play-circle--idle">
+                  <span className="wmp-play-icon" />
+                </div>
+                <span className="wmp-placeholder-text">Промо-видео скоро</span>
               </div>
-              <span className="wmp-placeholder-text">
-                {playing ? 'Воспроизведение…' : 'Промо-видео скоро'}
-              </span>
-            </div>
+            )}
 
-            {showPlaylist && (
+            {showPlaylist && hasTracks && (
               <ul className="wmp-playlist">
-                {TRACKS.map((name, i) => (
-                  <li key={name}>
+                {tracks.map((item, i) => (
+                  <li key={item.id}>
                     <button
-                      className={i === track ? 'active' : ''}
-                      onClick={() => selectTrack(i)}
+                      className={i === trackIndex ? 'active' : ''}
+                      onClick={() => openTrack(i, { autoplay: true })}
                     >
-                      {name}
+                      {item.title}
                     </button>
                   </li>
                 ))}
@@ -159,30 +240,44 @@ export default function Player() {
               className="wmp-range"
               type="range"
               min="0"
-              max={DURATION}
-              value={currentTime}
-              onChange={handleSeek}
+              max={duration > 0 ? duration : 0}
+              step="any"
+              value={Math.min(currentTime, duration > 0 ? duration : 0)}
+              onChange={(e) => seekTo(Number(e.target.value))}
               style={{ '--fill': `${seekPercent}%` }}
               aria-label="Перемотка"
+              disabled={!hasTracks}
             />
-            <span className="wmp-time">{formatTime(DURATION)}</span>
+            <span className="wmp-time">{formatTime(duration)}</span>
           </div>
 
           <div className="wmp-buttons-row">
             <div className="wmp-transport">
-              <button className="wmp-round-btn prev small" aria-label="Назад" onClick={() => skip(-10)} />
+              <button
+                className="wmp-round-btn prev small"
+                aria-label="Назад"
+                onClick={() => seekTo(currentTime - 10)}
+                disabled={!hasTracks}
+              />
               <button
                 className={`wmp-round-btn ${playing ? 'pause' : 'play'}`}
                 aria-label={playing ? 'Пауза' : 'Воспроизвести'}
                 aria-pressed={playing}
                 onClick={togglePlay}
+                disabled={!hasTracks}
               />
-              <button className="wmp-round-btn next small" aria-label="Вперёд" onClick={() => skip(10)} />
+              <button
+                className="wmp-round-btn next small"
+                aria-label="Вперёд"
+                onClick={() => seekTo(currentTime + 10)}
+                disabled={!hasTracks}
+              />
               <button
                 className="wmp-round-btn list small"
                 aria-label="Плейлист"
                 aria-pressed={showPlaylist}
                 onClick={() => setShowPlaylist((p) => !p)}
+                disabled={!hasTracks}
               />
             </div>
 

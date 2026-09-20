@@ -94,6 +94,41 @@ export async function adminUploadImage(file) {
 }
 
 /**
+ * Загружает картинку или видео в бакет напрямую из браузера (в обход нашего сервера, у которого
+ * на Vercel лимит на размер запроса): просим у бэкенда подписанную ссылку, затем PUT файла на неё.
+ * @param {File} file
+ * @param {{ onProgress?: (fraction: number) => void }} [options] — fraction от 0 до 1
+ * @returns {Promise<string>} публичный URL загруженного файла
+ */
+export async function adminUploadMedia(file, { onProgress } = {}) {
+  const { uploadUrl, publicUrl, headers } = await adminPost('/api/admin/upload/presign', {
+    contentType: file.type,
+    size: file.size,
+  });
+
+  await new Promise((resolve, reject) => {
+    // XMLHttpRequest вместо fetch: только он умеет сообщать прогресс отправки — для видео это важно.
+    const xhr = new XMLHttpRequest();
+    xhr.open('PUT', uploadUrl);
+    Object.entries(headers).forEach(([name, value]) => xhr.setRequestHeader(name, value));
+
+    xhr.upload.onprogress = (event) => {
+      if (event.lengthComputable) onProgress?.(event.loaded / event.total);
+    };
+    xhr.onload = () => {
+      if (xhr.status >= 200 && xhr.status < 300) resolve();
+      else reject(new Error(`Хранилище отклонило файл (код ${xhr.status}). Возможно, истекла ссылка — повторите загрузку.`));
+    };
+    // Сюда же попадает блокировка браузером из-за CORS — см. раздел про CORS бакета в backend/README.md.
+    xhr.onerror = () =>
+      reject(new Error('Не удалось загрузить файл в хранилище. Проверьте интернет и настройку CORS у бакета.'));
+    xhr.send(file);
+  });
+
+  return publicUrl;
+}
+
+/**
  * Логин админа. Токен сразу сохраняется — дальше все adminGet/adminPost его подхватят.
  */
 export async function adminLogin(email, password) {
