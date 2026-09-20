@@ -680,3 +680,16 @@
     flex-direction: row;
   }
 }
+
+.admin-notice {
+  padding: 10px 12px;
+  background: #f0fdf4;
+  border: 1px solid #bbf7d0;
+  border-radius: 8px;
+  color: #166534;
+  font-size: 14px;
+}
+
+.admin-fieldset .admin-media-grid + .admin-muted {
+  margin-top: 12px;
+}

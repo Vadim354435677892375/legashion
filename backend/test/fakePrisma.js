@@ -12,6 +12,12 @@ export function createFakePrisma() {
     nextId: 1,
   };
   const id = () => db.nextId++;
+  // Как уникальный индекс в Postgres: Prisma бросает ошибку с кодом P2002.
+  const throwIfSlugTaken = (slug, exceptId) => {
+    if (db.collections.some((c) => c.slug === slug && c.id !== exceptId)) {
+      throw Object.assign(new Error('Unique constraint failed on the fields: (`slug`)'), { code: 'P2002' });
+    }
+  };
 
   return {
     _db: db,
@@ -120,8 +126,15 @@ export function createFakePrisma() {
         );
         return row ? { ...row } : null;
       },
+      create: async ({ data }) => {
+        throwIfSlugTaken(data.slug);
+        const row = { id: id(), marquee: null, bannerVideoUrl: null, bannerPosterUrl: null, ...data };
+        db.collections.push(row);
+        return { ...row };
+      },
       update: async ({ where, data }) => {
         const row = db.collections.find((c) => c.id === where.id);
+        if (data.slug !== undefined) throwIfSlugTaken(data.slug, row.id);
         Object.assign(row, data);
         return { ...row };
       },

@@ -11,11 +11,17 @@ const collectionSchema = z.object({
   slug: z
     .string()
     .trim()
-    .min(1)
+    .min(1, 'Укажите slug')
     .regex(/^[a-z0-9-]+$/, 'slug — латиница, цифры и дефис, напр. "new-collection"'),
-  title: z.string().trim().min(1),
+  title: z.string().trim().min(1, 'Укажите заголовок'),
   marquee: z.string().trim().optional().nullable(),
 });
+
+// slug уникален: без этого повтор существующего slug падал бы 500 «Внутренняя ошибка сервера».
+function rethrowUniqueViolation(err) {
+  if (err?.code === 'P2002') throw new HttpError(409, 'Коллекция с таким slug уже существует');
+  throw err;
+}
 
 adminCollectionsRouter.get(
   '/',
@@ -34,7 +40,7 @@ adminCollectionsRouter.post(
   '/',
   asyncHandler(async (req, res) => {
     const data = collectionSchema.parse(req.body);
-    const collection = await prisma.collection.create({ data });
+    const collection = await prisma.collection.create({ data }).catch(rethrowUniqueViolation);
     res.status(201).json(collection);
   })
 );
@@ -48,7 +54,9 @@ adminCollectionsRouter.put(
     const exists = await prisma.collection.findUnique({ where: { id } });
     if (!exists) throw new HttpError(404, 'Коллекция не найдена');
 
-    const collection = await prisma.collection.update({ where: { id }, data });
+    const collection = await prisma.collection
+      .update({ where: { id }, data })
+      .catch(rethrowUniqueViolation);
     res.json(collection);
   })
 );
