@@ -68,19 +68,45 @@
   gap: 14px;
 }
 
+/* Кнопка, показывающая выбранный размер и открывающая окно выбора */
 .sysmsg-order-size {
   width: 180px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
   padding: 12px 14px;
   border: 2px solid #0a0a0a;
   border-radius: 4px;
   background: linear-gradient(to bottom, #f4f4f4, #cfcfcf);
+  box-shadow: inset 0 1px 0 #fff;
   font-family: var(--font-main);
   font-size: 16px;
   font-weight: 600;
   color: #1a1a1a;
-  text-align: center;
-  text-align-last: center;
   cursor: pointer;
+}
+
+.sysmsg-order-size:active {
+  background: linear-gradient(to bottom, #cfcfcf, #e6e6e6);
+  box-shadow: inset 0 2px 3px rgba(0, 0, 0, 0.25);
+}
+
+.sysmsg-order-size-label {
+  font-size: 13px;
+  font-weight: 400;
+  color: #555;
+}
+
+.sysmsg-order-size-value {
+  flex: 1;
+  text-align: center;
+  font-size: 18px;
+  font-weight: 700;
+}
+
+.sysmsg-order-size-arrow {
+  font-size: 12px;
 }
 
 .sysmsg-order-add-btn {
@@ -156,6 +182,141 @@
 
 .sysmsg-reopen:active {
   transform: translateY(0);
+}
+
+/* ---------- Окно выбора размера ---------- */
+.sizepicker-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 2000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 16px;
+  padding-bottom: calc(16px + env(safe-area-inset-bottom, 0px));
+  background: rgba(0, 0, 20, 0.55);
+  animation: sizepicker-fade 0.18s ease-out;
+}
+
+.sizepicker {
+  width: 100%;
+  max-width: 360px;
+  border: 2px solid #0a1f6b;
+  border-radius: 2px;
+  box-shadow: 0 0 0 1px #274fc9 inset, 0 12px 32px rgba(0, 0, 0, 0.55);
+  overflow: hidden;
+  animation: sizepicker-pop 0.28s cubic-bezier(0.34, 1.4, 0.64, 1);
+}
+
+.sizepicker-body {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  padding: 20px 18px 18px;
+  background: #d5d5d5;
+}
+
+.sizepicker-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 10px;
+}
+
+.sizepicker-tile {
+  min-height: 64px;
+  border: 2px solid #0a0a0a;
+  border-radius: 4px;
+  background: linear-gradient(to bottom, #f4f4f4, #cfcfcf);
+  box-shadow: inset 0 1px 0 #fff;
+  font-family: var(--font-main);
+  font-size: 22px;
+  font-weight: 700;
+  color: #1a1a1a;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+  transition: transform 0.12s ease;
+}
+
+.sizepicker-tile:hover {
+  transform: translateY(-2px);
+}
+
+.sizepicker-tile:active {
+  transform: translateY(0) scale(0.96);
+}
+
+/* Выбранный размер — «вдавленная» синяя плитка */
+.sizepicker-tile.is-active {
+  border-color: #0a1f6b;
+  background: linear-gradient(to bottom, #0d3fb0, #1454cf 45%, #2e6fe0);
+  box-shadow: inset 0 3px 6px rgba(0, 0, 0, 0.4);
+  color: #fff;
+}
+
+.sizepicker-tile:focus-visible,
+.sizepicker-cancel:focus-visible,
+.sysmsg-order-size:focus-visible {
+  outline: 2px dotted #0a1f6b;
+  outline-offset: 2px;
+}
+
+.sizepicker-cancel {
+  align-self: center;
+  padding: 10px 28px;
+  border: 2px solid #0a0a0a;
+  border-radius: 4px;
+  background: linear-gradient(to bottom, #f4f4f4, #cfcfcf);
+  font-family: var(--font-main);
+  font-size: 14px;
+  color: #1a1a1a;
+  cursor: pointer;
+}
+
+@keyframes sizepicker-fade {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+
+@keyframes sizepicker-pop {
+  from { opacity: 0; transform: scale(0.85) translateY(12px); }
+  to   { opacity: 1; transform: scale(1) translateY(0); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .sizepicker-overlay,
+  .sizepicker { animation: none; }
+  .sizepicker-tile { transition: none; }
+}
+
+@media (max-width: 480px) {
+  /* На телефоне окно прижато к низу, как нижняя шторка, а плитки крупнее */
+  .sizepicker-overlay {
+    align-items: flex-end;
+    padding: 12px;
+    padding-bottom: calc(12px + env(safe-area-inset-bottom, 0px));
+  }
+  .sizepicker {
+    max-width: none;
+    animation-name: sizepicker-sheet;
+  }
+  .sizepicker-grid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 12px;
+  }
+  .sizepicker-tile {
+    min-height: 72px;
+    font-size: 26px;
+  }
+  .sizepicker-cancel {
+    width: 100%;
+    padding: 14px;
+    font-size: 15px;
+  }
+}
+
+@keyframes sizepicker-sheet {
+  from { opacity: 0; transform: translateY(40px); }
+  to   { opacity: 1; transform: translateY(0); }
 }
 
 @media (max-width: 480px) {
