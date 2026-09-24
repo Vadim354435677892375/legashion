@@ -6,6 +6,12 @@
 }
 
 .product-cart-indicator {
+  /* Фиксируем в правом верхнем углу экрана, чтобы красный кружок
+     с количеством товаров всегда был на виду */
+  position: fixed;
+  top: 20px;
+  right: 28px;
+  z-index: 1000;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -17,18 +23,116 @@
   cursor: pointer;
 }
 
+/* Надпись «в корзину» подпрыгивает, когда точка долетела */
+.product-cart-label.bump {
+  animation: cart-label-bump 0.45s ease-out;
+}
+
+@keyframes cart-label-bump {
+  0%   { transform: translateY(0) scale(1); }
+  30%  { transform: translateY(-3px) scale(1.12) rotate(-3deg); }
+  60%  { transform: translateY(1px) scale(0.97) rotate(2deg); }
+  100% { transform: translateY(0) scale(1) rotate(0); }
+}
+
+/* Красный кружок с количеством: пружинистое «выскакивание» + кольцо + искры */
 .product-cart-count {
+  position: absolute;
+  top: -12px;
+  right: -14px;
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  min-width: 20px;
-  height: 20px;
-  padding: 0 5px;
-  border-radius: 50%;
-  background: #163a7a;
+  min-width: 22px;
+  height: 22px;
+  padding: 0 6px;
+  box-sizing: border-box;
+  border-radius: 999px;
+  background: radial-gradient(circle at 30% 25%, #ff5a4f 0%, #e10600 60%, #b30400 100%);
   color: #fff;
   font-size: 12px;
   font-weight: 700;
+  line-height: 1;
+  box-shadow: 0 0 0 2px #fff, 0 3px 10px rgba(225, 6, 0, 0.55);
+  animation: cart-badge-pop 0.75s cubic-bezier(0.34, 1.56, 0.64, 1) both;
+}
+
+.product-cart-count-num {
+  display: inline-block;
+  animation: cart-num-in 0.45s cubic-bezier(0.22, 1, 0.36, 1) 0.12s both;
+}
+
+/* Расходящееся кольцо */
+.product-cart-count::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  border: 2px solid #e10600;
+  opacity: 0;
+  pointer-events: none;
+  animation: cart-badge-ring 0.7s ease-out 0.05s;
+}
+
+/* Искры, разлетающиеся во все стороны */
+.product-cart-spark {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 4px;
+  height: 4px;
+  margin: -2px 0 0 -2px;
+  border-radius: 50%;
+  background: #ff3b30;
+  opacity: 0;
+  pointer-events: none;
+  animation: cart-spark 0.6s cubic-bezier(0.2, 0.8, 0.3, 1) 0.05s;
+}
+
+@keyframes cart-badge-pop {
+  0%   { transform: scale(0) rotate(-40deg); opacity: 0; }
+  45%  { transform: scale(1.7) rotate(12deg); opacity: 1; }
+  70%  { transform: scale(0.85) rotate(-6deg); }
+  100% { transform: scale(1) rotate(0); opacity: 1; }
+}
+
+@keyframes cart-num-in {
+  0%   { transform: translateY(70%) scale(0.4); opacity: 0; }
+  100% { transform: translateY(0) scale(1); opacity: 1; }
+}
+
+@keyframes cart-badge-ring {
+  0%   { transform: scale(1);   opacity: 0.9; }
+  100% { transform: scale(2.8); opacity: 0; }
+}
+
+@keyframes cart-spark {
+  0%   { transform: rotate(var(--a)) translateY(-8px) scale(1); opacity: 1; }
+  100% { transform: rotate(var(--a)) translateY(-26px) scale(0); opacity: 0; }
+}
+
+/* Красная точка, летящая от кнопки к корзине (создаётся из utils/flyToCart.js) */
+.fly-dot {
+  position: fixed;
+  top: 0;
+  left: 0;
+  z-index: 3000;
+  border-radius: 50%;
+  background: radial-gradient(circle at 30% 25%, #ff6b5f 0%, #e10600 70%);
+  box-shadow: 0 0 12px 3px rgba(225, 6, 0, 0.6);
+  pointer-events: none;
+  will-change: transform, opacity;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .product-cart-count,
+  .product-cart-count::after,
+  .product-cart-count-num,
+  .product-cart-spark,
+  .product-cart-label.bump {
+    animation: none;
+  }
+  .product-cart-spark { display: none; }
 }
 
 .product-back {

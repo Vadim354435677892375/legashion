@@ -1,8 +1,9 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { Link, useNavigate, useParams } from 'react-router-dom';
 import { useCart } from '../../context/CartContext';
 import { apiGet } from '../../utils/api';
 import { getDiscountedPrice } from '../../utils/pricing';
+import { flyToCart } from '../../utils/flyToCart';
 import './ProductPage.css';
 import Gallery from './blocks/gallery/Gallery';
 import SystemMessage from './blocks/system-message/SystemMessage';
@@ -20,6 +21,18 @@ export default function ProductPage() {
   const [product, setProduct] = useState(null);
   const [loading, setLoading] = useState(true);
   const [notFound, setNotFound] = useState(false);
+
+  // Число в красном кружке. Обновляется не сразу, а когда красная точка
+  // «долетела» до корзины — так появление кружка выглядит как результат полёта.
+  const [shownCount, setShownCount] = useState(totalCount);
+  const indicatorRef = useRef(null);
+  const flightsRef = useRef(0);
+  const totalRef = useRef(totalCount);
+  totalRef.current = totalCount;
+
+  useEffect(() => {
+    if (flightsRef.current === 0) setShownCount(totalCount);
+  }, [totalCount]);
 
   useEffect(() => {
     const controller = new AbortController();
@@ -52,7 +65,7 @@ export default function ProductPage() {
     }
   };
 
-  const handleAddToCart = (size) => {
+  const handleAddToCart = (size, buttonEl) => {
     if (!product) return;
     const finalPrice = product.discountPercent
       ? getDiscountedPrice(product.price, product.discountPercent)
@@ -67,6 +80,18 @@ export default function ProductPage() {
       discount: product.discountPercent || undefined,
       qty: 1,
     });
+
+    // Точка полёта: место, где появляется красный кружок (правый верхний угол ссылки)
+    const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    const target = indicatorRef.current?.getBoundingClientRect();
+    if (reduceMotion || !buttonEl || !target) return;
+
+    flightsRef.current += 1;
+    flyToCart(buttonEl, { x: target.right + 3, y: target.top - 1 }).then(() => {
+      flightsRef.current -= 1;
+      if (flightsRef.current === 0) setShownCount(totalRef.current);
+      else setShownCount((c) => c + 1);
+    });
   };
 
   return (
@@ -75,9 +100,21 @@ export default function ProductPage() {
         ← назад
       </button>
 
-      <Link className="product-cart-indicator" to="/cart">
-        <span>в корзину</span>
-        {totalCount > 0 && <span className="product-cart-count">{totalCount}</span>}
+      <Link ref={indicatorRef} className="product-cart-indicator" to="/cart">
+        {/* Ключ заставляет надпись «подпрыгнуть» при каждом приземлении точки */}
+        <span key={`label-${shownCount}`} className={shownCount > 0 ? 'product-cart-label bump' : 'product-cart-label'}>
+          в корзину
+        </span>
+        {/* key={shownCount} перемонтирует кружок при каждом изменении числа —
+            так анимация «выскакивания» проигрывается заново при каждом добавлении */}
+        {shownCount > 0 && (
+          <span key={shownCount} className="product-cart-count">
+            <span className="product-cart-count-num">{shownCount}</span>
+            {Array.from({ length: 8 }, (_, i) => (
+              <i key={i} className="product-cart-spark" style={{ '--a': `${i * 45}deg` }} />
+            ))}
+          </span>
+        )}
       </Link>
 
       {notFound && <p className="product-not-found">Товар не найден</p>}

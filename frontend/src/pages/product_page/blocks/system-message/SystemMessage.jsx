@@ -5,7 +5,8 @@ const SIZES = ['S', 'M', 'L', 'XL'];
 
 // Блок «System message» — окно в стиле классического Windows с характеристиками товара.
 // details: { density: string, composition: string } — плотность и состав ткани.
-// onAddToCart(size): вызывается при клике на кнопку «в корзину», наверх уходит выбранный размер.
+// onAddToCart(size, buttonEl): вызывается при клике на кнопку «в корзину» — наверх уходит
+// выбранный размер и сама кнопка (откуда стартует анимация полёта в корзину).
 // Выбор размера и кнопка «в корзину» находятся внутри этого же окна.
 // Закрывается по крестику; повторно открыть можно кнопкой-заглушкой снизу.
 export default function SystemMessage({ details = {}, onAddToCart }) {
@@ -55,7 +56,7 @@ export default function SystemMessage({ details = {}, onAddToCart }) {
           <button
             type="button"
             className="sysmsg-order-add-btn"
-            onClick={() => onAddToCart?.(size)}
+            onClick={(e) => onAddToCart?.(size, e.currentTarget)}
           >
             в корзину
           </button>
