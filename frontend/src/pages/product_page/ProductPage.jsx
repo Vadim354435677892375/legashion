@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from 'react';
 import { Link, useNavigate, useParams } from 'react-router-dom';
 import { useCart } from '../../context/CartContext';
-import { apiGet } from '../../utils/api';
+import { useCachedGet } from '../../hooks/useCachedGet';
 import { getDiscountedPrice } from '../../utils/pricing';
 import { flyToCart } from '../../utils/flyToCart';
 import './ProductPage.css';
@@ -18,9 +18,13 @@ export default function ProductPage() {
   const { addItem, totalCount } = useCart();
   const navigate = useNavigate();
 
-  const [product, setProduct] = useState(null);
-  const [loading, setLoading] = useState(true);
-  const [notFound, setNotFound] = useState(false);
+  // Товар берётся из общего кэша: если его уже открывали, страница показывается мгновенно
+  const { data: product, loading, error } = useCachedGet(`/api/products/${id}`);
+  const notFound = error?.status === 404;
+
+  useEffect(() => {
+    if (error && error.status !== 404) console.error(error);
+  }, [error]);
 
   // Число в красном кружке. Обновляется не сразу, а когда красная точка
   // «долетела» до корзины — так появление кружка выглядит как результат полёта.
@@ -33,26 +37,6 @@ export default function ProductPage() {
   useEffect(() => {
     if (flightsRef.current === 0) setShownCount(totalCount);
   }, [totalCount]);
-
-  useEffect(() => {
-    const controller = new AbortController();
-    setLoading(true);
-    setNotFound(false);
-
-    apiGet(`/api/products/${id}`, { signal: controller.signal })
-      .then(setProduct)
-      .catch((err) => {
-        if (err.name === 'AbortError') return;
-        if (err.status === 404) {
-          setNotFound(true);
-        } else {
-          console.error(err);
-        }
-      })
-      .finally(() => setLoading(false));
-
-    return () => controller.abort();
-  }, [id]);
 
   // Возвращаемся туда, откуда пришли (главная, страница коллекции и т.д.),
   // а не всегда на /home. Если истории нет (открыли ссылку напрямую) —
