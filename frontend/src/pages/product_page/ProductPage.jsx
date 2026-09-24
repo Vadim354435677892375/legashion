@@ -75,6 +75,7 @@ export default function ProductPage() {
       id: `${product.id}-${size}`,
       productId: product.id, // по нему бэкенд сам берёт актуальную цену при оформлении заказа
       name: product.name,
+      image: product.images?.[0], // первое фото товара — для миниатюры в корзине
       size,
       price: finalPrice,
       discount: product.discountPercent || undefined,
