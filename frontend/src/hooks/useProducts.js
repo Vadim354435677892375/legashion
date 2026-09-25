@@ -1,35 +1,19 @@
-import { useEffect, useState } from 'react';
-import { apiGet } from '../utils/api';
+import { useCachedGet } from './useCachedGet';
+import { fetchCached } from '../utils/apiCache';
+
+const pathFor = (slug) => `/api/products?collection=${encodeURIComponent(slug)}`;
+
+// Товары главной страницы начинаем грузить уже при старте приложения (во время заставки),
+// чтобы к моменту показа главной они уже лежали в кэше.
+fetchCached(pathFor('home')).catch(() => {});
 
 /**
  * Загружает товары одной коллекции (GET /api/products?collection=slug).
- * Используется вместо прежних захардкоженных списков
- * (homeProducts.js/saleItems.js/tshirtItems.js/archiveItems.js/collectionItems.js).
+ * Ответ кэшируется: при возврате на страницу товары появляются сразу, без повторной загрузки.
  * @param {string} collectionSlug
  * @returns {{ products: Array, loading: boolean, error: Error|null }}
  */
 export function useProducts(collectionSlug) {
-  const [products, setProducts] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
-
-  useEffect(() => {
-    const controller = new AbortController();
-    setLoading(true);
-    setError(null);
-
-    apiGet(`/api/products?collection=${encodeURIComponent(collectionSlug)}`, {
-      signal: controller.signal,
-    })
-      .then(setProducts)
-      .catch((err) => {
-        if (err.name === 'AbortError') return;
-        setError(err);
-      })
-      .finally(() => setLoading(false));
-
-    return () => controller.abort();
-  }, [collectionSlug]);
-
-  return { products, loading, error };
+  const { data, loading, error } = useCachedGet(pathFor(collectionSlug));
+  return { products: data ?? [], loading, error };
 }

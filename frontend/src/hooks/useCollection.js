@@ -1,32 +1,12 @@
-import { useEffect, useState } from 'react';
-import { apiGet } from '../utils/api';
+import { useCachedGet } from './useCachedGet';
 
 /**
  * Загружает метаданные коллекции по slug (GET /api/collections/:slug) —
- * заголовок страницы и текст бегущей строки. Используется CollectionPage.jsx
- * вместо прежнего захардкоженного collectionItems.js.
+ * заголовок страницы и текст бегущей строки. Используется CollectionPage.jsx.
+ * Ответ кэшируется (см. utils/apiCache.js).
  * @param {string} slug
  */
 export function useCollection(slug) {
-  const [collection, setCollection] = useState(null);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
-
-  useEffect(() => {
-    const controller = new AbortController();
-    setLoading(true);
-    setError(null);
-
-    apiGet(`/api/collections/${encodeURIComponent(slug)}`, { signal: controller.signal })
-      .then(setCollection)
-      .catch((err) => {
-        if (err.name === 'AbortError') return;
-        setError(err);
-      })
-      .finally(() => setLoading(false));
-
-    return () => controller.abort();
-  }, [slug]);
-
-  return { collection, loading, error };
+  const { data, loading, error } = useCachedGet(`/api/collections/${encodeURIComponent(slug)}`);
+  return { collection: data, loading, error };
 }
