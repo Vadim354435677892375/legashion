@@ -30,6 +30,43 @@ html {
   text-size-adjust: 100%;
 }
 
+/* Убираем стандартную синюю подсветку/вспышку при тапе на мобильных браузерах
+   (Chrome/Safari на Android и iOS) — появляется на кнопках, ссылках и переходах
+   между страницами (React Router Link/NavLink). */
+html,
+body,
+a,
+button,
+input,
+textarea,
+select,
+[role="button"],
+[tabindex] {
+  -webkit-tap-highlight-color: transparent;
+  -webkit-touch-callout: none;
+}
+
+a,
+button,
+[role="button"] {
+  outline: none;
+  -webkit-user-drag: none;
+}
+
+a:focus,
+button:focus,
+[role="button"]:focus {
+  outline: none;
+}
+
+/* Сохраняем видимость фокуса для клавиатурной навигации (доступность) */
+a:focus-visible,
+button:focus-visible,
+[role="button"]:focus-visible {
+  outline: 2px solid #1a1a1a;
+  outline-offset: 2px;
+}
+
 body {
   font-family: var(--font-main);
   background: #C0C0C0;
