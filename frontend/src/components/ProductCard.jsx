@@ -1,6 +1,7 @@
 import { useRef, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { formatPrice } from '../utils/pricing';
+import FadeBg from './FadeBg';
 
 // ЕДИНАЯ карточка товара — используется на всех страницах со списками
 // товаров (главная, коллекции, Sale, Tshirts, Archive) вместо того, чтобы
@@ -185,9 +186,9 @@ export default function ProductCard({ id, name, price, oldPrice, images = [], ba
 
   return (
     <Link className="pc-card" to={`/product/${id}`}>
-      <div
+      <FadeBg
+        src={slots[active]}
         className="pc-image"
-        style={slots[active] ? { backgroundImage: `url(${slots[active]})` } : undefined}
         onTouchStart={handleTouchStart}
         onTouchMove={handleTouchMove}
         onTouchEnd={handleTouchEnd}
@@ -202,7 +203,7 @@ export default function ProductCard({ id, name, price, oldPrice, images = [], ba
             ))}
           </div>
         )}
-      </div>
+      </FadeBg>
 
       <div className="pc-info">
         <div className="pc-name">{name}</div>

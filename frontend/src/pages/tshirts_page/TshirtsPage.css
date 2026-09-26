@@ -21,6 +21,7 @@
 }
 
 .tshirts-hero {
+  position: relative;
   width: 130px;
   aspect-ratio: 1 / 1;
   margin: 0 auto 24px;

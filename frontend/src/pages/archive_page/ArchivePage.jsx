@@ -6,6 +6,7 @@ import CartButton from '../../components/CartButton';
 import { useProducts } from '../../hooks/useProducts';
 import { useSiteMedia } from '../../hooks/useSiteMedia';
 import ProductCard from '../../components/ProductCard';
+import FadeBg from '../../components/FadeBg';
 
 // Страница коллекции «Archive» — отдельная страница в файловой системе,
 // по аналогии с pages/collection_page. Открывается по клику на карточку
@@ -42,13 +43,11 @@ function BannerCarousel() {
 
         <div className="archive-carousel-viewport">
           {slides.map(({ i, image }) => (
-            <div
+            <FadeBg
               key={i}
+              src={image}
               className="archive-carousel-slide"
-              style={{
-                transform: `translateX(${(i - index) * 100}%)`,
-                ...(image ? { backgroundImage: `url(${image})` } : {}),
-              }}
+              style={{ transform: `translateX(${(i - index) * 100}%)` }}
             />
           ))}
         </div>

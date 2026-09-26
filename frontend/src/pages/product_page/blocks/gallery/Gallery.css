@@ -12,12 +12,11 @@
 }
 
 .gallery-image {
+  position: relative;
+  overflow: hidden;
   width: 100%;
   aspect-ratio: 1 / 1;
   background-color: #fff;
-  background-size: contain;
-  background-repeat: no-repeat;
-  background-position: center;
   border-radius: 6px;
   box-shadow: 0 6px 16px rgba(0, 0, 0, 0.35);
   touch-action: pan-y;

@@ -1,6 +1,7 @@
 import { useRef } from 'react';
 import { Link } from 'react-router-dom';
 import { useSiteMedia } from '../../../../hooks/useSiteMedia';
+import FadeBg from '../../../../components/FadeBg';
 import './CollectionBlock.css';
 
 // Блок «Категории» — карусель карточек: New Collection / Archive / Sale /
@@ -53,10 +54,7 @@ export default function Categories() {
           const image = media.get(mediaKey);
           const content = (
             <>
-              <div
-                className="categories-image"
-                style={image ? { backgroundImage: `url(${image})` } : undefined}
-              />
+              <FadeBg src={image} className="categories-image" />
               <div className="categories-label">
                 <span>{label}</span>
               </div>

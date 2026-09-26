@@ -4,6 +4,7 @@ import CartButton from '../../components/CartButton';
 import { useProducts } from '../../hooks/useProducts';
 import { useSiteMedia } from '../../hooks/useSiteMedia';
 import ProductCard from '../../components/ProductCard';
+import FadeBg from '../../components/FadeBg';
 
 // Страница «Футболки» — отдельная страница в файловой системе, по аналогии
 // с pages/archive_page и pages/sale_page. Открывается по клику на карточку
@@ -22,10 +23,7 @@ export default function TshirtsPage() {
         ← назад
       </Link>
 
-      <div
-        className="tshirts-hero"
-        style={heroImage ? { backgroundImage: `url(${heroImage})` } : undefined}
-      />
+      <FadeBg src={heroImage} className="tshirts-hero" />
 
       {error && <p className="tshirts-error">Не удалось загрузить товары</p>}
 

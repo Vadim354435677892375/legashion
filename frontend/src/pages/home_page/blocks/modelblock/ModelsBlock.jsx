@@ -1,6 +1,7 @@
 import './ModelsBlock.css';
 import paintFrame from '../../../../assets/paint-frame.png';
 import { useSiteMedia } from '../../../../hooks/useSiteMedia';
+import FadeBg from '../../../../components/FadeBg';
 
 // Блок «Фото моделей» — реальный скриншот окна Paint (из макета) как фон,
 // а поверх белого холста этого скриншота накладываются фото моделей.
@@ -21,9 +22,9 @@ export default function ModelsBlock() {
         {MODELS.map(({ mediaKey, alt }) => {
           const image = media.get(mediaKey);
           return (
-            <div
+            <FadeBg
+              src={image}
               className="paint-photo"
-              style={image ? { backgroundImage: `url(${image})` } : undefined}
               key={mediaKey}
               role="img"
               aria-label={alt}

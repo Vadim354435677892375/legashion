@@ -1,5 +1,6 @@
 import { useRef, useState } from 'react';
 import './Gallery.css';
+import FadeBg from '../../../../components/FadeBg';
 
 // Минимальное расстояние свайпа в пикселях, после которого считаем,
 // что пользователь листает фото, а не просто задел его пальцем.
@@ -46,9 +47,10 @@ export default function Gallery({ images = [] }) {
           ←
         </button>
 
-        <div
+        <FadeBg
+          src={slots[active]}
           className="gallery-image"
-          style={slots[active] ? { backgroundImage: `url(${slots[active]})` } : undefined}
+          contain
           onTouchStart={handleTouchStart}
           onTouchMove={handleTouchMove}
           onTouchEnd={handleTouchEnd}
