@@ -5,7 +5,7 @@ import CartButton from '../../components/CartButton';
 import { useCollection } from '../../hooks/useCollection';
 import { useProducts } from '../../hooks/useProducts';
 import { useSiteMedia } from '../../hooks/useSiteMedia';
-import { formatPrice } from '../../utils/pricing';
+import ProductCard from '../../components/ProductCard';
 
 // Страница отдельной коллекции (открывается по клику на карточку в блоке
 // «Категории» на главной). Archive вынесен в свою собственную страницу
@@ -81,17 +81,8 @@ export default function CollectionPage() {
 
       {!loading && !error && (
         <div className="collection-grid">
-          {products.map(({ id, name, price, images }) => (
-            <Link className="collection-card" to={`/product/${id}`} key={id}>
-              <div
-                className="collection-card-image"
-                style={images[0] ? { backgroundImage: `url(${images[0]})` } : undefined}
-              />
-              <div className="collection-card-info">
-                <div className="collection-card-name">{name}</div>
-                <div className="collection-card-price">{formatPrice(price)}</div>
-              </div>
-            </Link>
+          {products.map((product) => (
+            <ProductCard key={product.id} {...product} />
           ))}
         </div>
       )}

@@ -1,14 +1,17 @@
 import { Link } from 'react-router-dom';
 import './SalePage.css';
 import CartButton from '../../components/CartButton';
+import ProductCard from '../../components/ProductCard';
 import { useProducts } from '../../hooks/useProducts';
-import { formatPrice, getDiscountedPrice } from '../../utils/pricing';
+import { getDiscountedPrice } from '../../utils/pricing';
 
 // Страница «Sale» — отдельная страница в файловой системе, по аналогии
 // с pages/archive_page. Открывается по клику на карточку Sale в блоке
 // «Категории» на главной (маршрут /sale).
 // Товары приходят с бэкенда (GET /api/products?collection=sale), заменяя
 // прежний захардкоженный saleItems.js.
+// Карточка (фото со свайпом, название, цена/скидка) — общий компонент
+// components/ProductCard.jsx, используется так же на других страницах.
 
 export default function SalePage() {
   const { products, loading, error } = useProducts('sale');
@@ -29,28 +32,17 @@ export default function SalePage() {
 
       {!loading && !error && (
         <div className="sale-grid">
-          {products.map(({ id, name, price, discountPercent, images }) => {
-            const discounted = getDiscountedPrice(price, discountPercent);
-            return (
-              <Link className="sale-card" to={`/product/${id}`} key={id}>
-                <div
-                  className="sale-card-image"
-                  style={images[0] ? { backgroundImage: `url(${images[0]})` } : undefined}
-                >
-                  {discountPercent > 0 && <span className="sale-badge">- {discountPercent}%</span>}
-                </div>
-                <div className="sale-card-info">
-                  <div className="sale-card-name">{name}</div>
-                  <div className="sale-card-price">
-                    {discountPercent > 0 && (
-                      <span className="sale-card-price-old">{formatPrice(price)}</span>
-                    )}
-                    <span className="sale-card-price-new">{formatPrice(discounted)}</span>
-                  </div>
-                </div>
-              </Link>
-            );
-          })}
+          {products.map(({ id, name, price, discountPercent, images }) => (
+            <ProductCard
+              key={id}
+              id={id}
+              name={name}
+              images={images}
+              price={getDiscountedPrice(price, discountPercent)}
+              oldPrice={discountPercent > 0 ? price : undefined}
+              badgeText={discountPercent > 0 ? `- ${discountPercent}%` : undefined}
+            />
+          ))}
         </div>
       )}
 

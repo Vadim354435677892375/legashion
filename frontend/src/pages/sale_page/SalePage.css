@@ -76,79 +76,17 @@
   gap: 16px;
 }
 
-.sale-card {
-  display: block;
-  text-decoration: none;
-  border: 2px solid #6b6b6b;
-  border-radius: 2px;
-  overflow: hidden;
-  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.35);
-  transition: transform 0.15s ease, box-shadow 0.15s ease;
-}
-
-.sale-card:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.45);
-}
-
-.sale-card-image {
-  position: relative;
-  aspect-ratio: 1 / 1;
-  background: #c7c7c7;
-  background-size: cover;
-  background-position: center;
-  border-bottom: 2px solid #6b6b6b;
-}
-
-.sale-badge {
-  position: absolute;
+/* Фирменная плашка скидки Sale поверх обычного .pc-badge из ProductCard.jsx */
+.sale-grid .pc-badge {
   top: 10px;
   right: 8px;
   padding: 5px 12px;
   border-radius: 12px;
   background: linear-gradient(to bottom, #ff5a4e 0%, #c81f12 55%, #8f0d05 100%);
   box-shadow: 0 2px 5px rgba(0, 0, 0, 0.5), inset 0 1px 0 rgba(255, 255, 255, 0.5);
-  color: #fff;
-  font-family: var(--font-main);
   font-size: 12px;
   font-weight: 700;
-  letter-spacing: 0.02em;
   transform: rotate(4deg);
-}
-
-.sale-card-info {
-  background: #a9a9a9;
-  padding: 8px 6px;
-  text-align: center;
-}
-
-.sale-card-name {
-  font-family: var(--font-main);
-  font-size: 11px;
-  letter-spacing: 0.02em;
-  line-height: 1.5;
-  color: #c98a2e;
-}
-
-.sale-card-price {
-  display: flex;
-  align-items: baseline;
-  justify-content: center;
-  gap: 8px;
-  font-family: var(--font-main);
-  font-size: 11px;
-  letter-spacing: 0.02em;
-  line-height: 1.5;
-}
-
-.sale-card-price-old {
-  color: #7a7a7a;
-  text-decoration: line-through;
-}
-
-.sale-card-price-new {
-  color: #1e6fd9;
-  font-weight: 700;
 }
 
 .sale-back {
@@ -208,10 +146,6 @@
   }
   .sale-grid {
     gap: 10px;
-  }
-  .sale-card-name,
-  .sale-card-price {
-    font-size: 10px;
   }
   .sale-title {
     font-size: 22px;

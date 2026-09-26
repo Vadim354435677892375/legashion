@@ -41,51 +41,6 @@
   gap: 16px;
 }
 
-.tshirts-card {
-  display: block;
-  text-decoration: none;
-  border: 2px solid #6b6b6b;
-  border-radius: 2px;
-  overflow: hidden;
-  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.35);
-  transition: transform 0.15s ease, box-shadow 0.15s ease;
-}
-
-.tshirts-card:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.45);
-}
-
-.tshirts-card-image {
-  aspect-ratio: 1 / 1;
-  background: #c7c7c7;
-  background-size: cover;
-  background-position: center;
-  border-bottom: 2px solid #6b6b6b;
-}
-
-.tshirts-card-info {
-  background: #a9a9a9;
-  padding: 8px 6px;
-  text-align: center;
-}
-
-.tshirts-card-name,
-.tshirts-card-price {
-  font-family: var(--font-main);
-  font-size: 11px;
-  letter-spacing: 0.02em;
-  line-height: 1.5;
-}
-
-.tshirts-card-name {
-  color: #c98a2e;
-}
-
-.tshirts-card-price {
-  color: #1e6fd9;
-}
-
 .tshirts-back {
   display: block;
   margin: 28px auto 0;
@@ -138,10 +93,6 @@
   .tshirts-grid {
     max-width: 100%;
     gap: 10px;
-  }
-  .tshirts-card-name,
-  .tshirts-card-price {
-    font-size: 10px;
   }
   .tshirts-hero {
     width: 100px;

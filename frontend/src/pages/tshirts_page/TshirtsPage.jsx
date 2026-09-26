@@ -3,7 +3,7 @@ import './TshirtsPage.css';
 import CartButton from '../../components/CartButton';
 import { useProducts } from '../../hooks/useProducts';
 import { useSiteMedia } from '../../hooks/useSiteMedia';
-import { formatPrice } from '../../utils/pricing';
+import ProductCard from '../../components/ProductCard';
 
 // Страница «Футболки» — отдельная страница в файловой системе, по аналогии
 // с pages/archive_page и pages/sale_page. Открывается по клику на карточку
@@ -31,17 +31,8 @@ export default function TshirtsPage() {
 
       {!loading && !error && (
         <div className="tshirts-grid">
-          {products.map(({ id, name, price, images }) => (
-            <Link className="tshirts-card" to={`/product/${id}`} key={id}>
-              <div
-                className="tshirts-card-image"
-                style={images[0] ? { backgroundImage: `url(${images[0]})` } : undefined}
-              />
-              <div className="tshirts-card-info">
-                <div className="tshirts-card-name">{name}</div>
-                <div className="tshirts-card-price">{formatPrice(price)}</div>
-              </div>
-            </Link>
+          {products.map((product) => (
+            <ProductCard key={product.id} {...product} />
           ))}
         </div>
       )}

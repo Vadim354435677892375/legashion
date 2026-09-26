@@ -5,7 +5,7 @@ import defaultLogo from '../../assets/logo-glitch.gif';
 import CartButton from '../../components/CartButton';
 import { useProducts } from '../../hooks/useProducts';
 import { useSiteMedia } from '../../hooks/useSiteMedia';
-import { formatPrice } from '../../utils/pricing';
+import ProductCard from '../../components/ProductCard';
 
 // Страница коллекции «Archive» — отдельная страница в файловой системе,
 // по аналогии с pages/collection_page. Открывается по клику на карточку
@@ -102,17 +102,8 @@ export default function ArchivePage() {
 
       {!loading && !error && (
         <div className="archive-grid">
-          {products.map(({ id, name, price, images }) => (
-            <Link className="archive-card" to={`/product/${id}`} key={id}>
-              <div
-                className="archive-card-image"
-                style={images[0] ? { backgroundImage: `url(${images[0]})` } : undefined}
-              />
-              <div className="archive-card-info">
-                <div className="archive-card-name">{name}</div>
-                <div className="archive-card-price">{formatPrice(price)}</div>
-              </div>
-            </Link>
+          {products.map((product) => (
+            <ProductCard key={product.id} {...product} />
           ))}
         </div>
       )}
