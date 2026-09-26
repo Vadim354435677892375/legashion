@@ -20,6 +20,8 @@
   background-position: center;
   border-radius: 6px;
   box-shadow: 0 6px 16px rgba(0, 0, 0, 0.35);
+  touch-action: pan-y;
+  -webkit-tap-highlight-color: transparent;
 }
 
 .gallery-arrow {
