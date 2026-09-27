@@ -16,6 +16,7 @@
     "prisma:studio": "prisma studio",
     "seed": "node prisma/seed.js",
     "admin:set-password": "node scripts/set-admin-password.js",
+    "admin:delete": "node scripts/delete-admin.js",
     "test": "node --experimental-test-module-mocks --test \"test/*.test.js\""
   },
   "dependencies": {
