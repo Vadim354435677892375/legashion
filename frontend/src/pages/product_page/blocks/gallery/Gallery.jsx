@@ -1,4 +1,4 @@
-import { useRef, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import './Gallery.css';
 import FadeBg from '../../../../components/FadeBg';
 
@@ -6,13 +6,50 @@ import FadeBg from '../../../../components/FadeBg';
 // что пользователь листает фото, а не просто задел его пальцем.
 const SWIPE_THRESHOLD = 40;
 
+// Пропорция блока, пока реальные размеры текущего фото ещё не известны
+// (или фото нет вообще) — квадрат как безопасный дефолт.
+const DEFAULT_RATIO = 1;
+
 // Блок «Галерея товара» — большое фото + стрелки переключения + превью снизу.
 // images: массив путей к фото товара (например ['/assets/product-1.jpg', ...]).
 // Пока фото нет — рисуется белый плейсхолдер вместо картинки.
 // В адаптиве (на сенсорных экранах) фото дополнительно листается свайпом.
+//
+// Раньше блок всегда был квадратным (aspect-ratio: 1/1), а фото вписывалось
+// в него через background-size: contain — если у фото пропорции отличались
+// от квадрата, по бокам или сверху/снизу оставались белые полосы (фон блока).
+// Теперь мы подгружаем текущее фото отдельно, чтобы узнать его реальные
+// ширину/высоту, и подстраиваем пропорции блока под них — тогда фото
+// заполняет блок целиком без полос и без обрезки.
 export default function Gallery({ images = [] }) {
   const slots = images.length > 0 ? images : [null, null, null];
   const [active, setActive] = useState(0);
+  const [ratio, setRatio] = useState(DEFAULT_RATIO);
+
+  const activeSrc = slots[active];
+
+  useEffect(() => {
+    if (!activeSrc) {
+      setRatio(DEFAULT_RATIO);
+      return undefined;
+    }
+
+    let cancelled = false;
+    const img = new Image();
+    img.onload = () => {
+      if (cancelled) return;
+      setRatio(img.naturalWidth / img.naturalHeight);
+    };
+    img.onerror = () => {
+      if (cancelled) return;
+      setRatio(DEFAULT_RATIO);
+    };
+    img.src = activeSrc;
+
+    return () => {
+      cancelled = true;
+    };
+  }, [activeSrc]);
 
   const prev = () => setActive((i) => (i - 1 + slots.length) % slots.length);
   const next = () => setActive((i) => (i + 1) % slots.length);
@@ -48,8 +85,9 @@ export default function Gallery({ images = [] }) {
         </button>
 
         <FadeBg
-          src={slots[active]}
+          src={activeSrc}
           className="gallery-image"
+          style={{ aspectRatio: ratio }}
           contain
           onTouchStart={handleTouchStart}
           onTouchMove={handleTouchMove}
