@@ -34,6 +34,22 @@ model LoginAttempt {
   @@index([email, createdAt])
 }
 
+// Одноразовый код подтверждения входа в админку (2FA по email), выпускается
+// после успешной проверки email+пароля в POST /api/admin/auth/login и
+// проверяется в POST /api/admin/auth/verify-code. Код живёт CODE_TTL_MS
+// (см. routes/admin/auth.js) и одноразовый — строка удаляется сразу после
+// успешной проверки или после исчерпания попыток.
+model AdminLoginCode {
+  id        String   @id @default(cuid())
+  adminId   Int
+  codeHash  String
+  attempts  Int      @default(0)
+  expiresAt DateTime
+  createdAt DateTime @default(now())
+
+  @@index([adminId])
+}
+
 model Collection {
   id        Int                 @id @default(autoincrement())
   slug      String              @unique // 'home' | 'sale' | 'archive' | 'tshirts' | 'new-collection' | ...

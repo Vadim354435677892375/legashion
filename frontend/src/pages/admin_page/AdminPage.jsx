@@ -8,6 +8,7 @@ import {
   adminLogin,
   adminLogout,
   adminMe,
+  adminVerifyCode,
   getToken,
   setUnauthorizedHandler,
 } from '../../utils/adminApi';
@@ -26,18 +27,44 @@ const TABS = [
   { id: 'orders', label: 'Заказы' },
 ];
 
+// Вход в два шага: сначала email+пароль (POST /login), сервер в ответ шлёт
+// код на почту и не выдаёт токен — токен выдаётся только после того, как этот
+// код введён и проверен (POST /verify-code). credsRef хранит email/пароль,
+// введённые на первом шаге, чтобы на экране кода была ссылка «назад» без
+// повторного набора формы, и чтобы можно было запросить письмо заново.
 function LoginScreen({ onSuccess }) {
+  const [step, setStep] = useState('credentials'); // 'credentials' | 'code'
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [code, setCode] = useState('');
+  const [verificationId, setVerificationId] = useState(null);
+  const [maskedEmail, setMaskedEmail] = useState('');
   const [error, setError] = useState(null);
   const [pending, setPending] = useState(false);
 
-  async function handleSubmit(event) {
+  async function requestCode(event) {
     event.preventDefault();
     setPending(true);
     setError(null);
     try {
       const data = await adminLogin(email.trim(), password);
+      setVerificationId(data.verificationId);
+      setMaskedEmail(data.maskedEmail);
+      setCode('');
+      setStep('code');
+    } catch (err) {
+      setError(err.message);
+    } finally {
+      setPending(false);
+    }
+  }
+
+  async function handleVerify(event) {
+    event.preventDefault();
+    setPending(true);
+    setError(null);
+    try {
+      const data = await adminVerifyCode(verificationId, code.trim());
       onSuccess(data.email);
     } catch (err) {
       setError(err.message);
@@ -46,9 +73,55 @@ function LoginScreen({ onSuccess }) {
     }
   }
 
+  if (step === 'code') {
+    return (
+      <div className="admin-login">
+        <form className="admin-login-form" onSubmit={handleVerify}>
+          <h1>LEGASHION — админка</h1>
+          <p className="admin-login-hint">
+            Код отправлен на {maskedEmail}. Он действует 10 минут.
+          </p>
+
+          <label>
+            Код из письма
+            <input
+              type="text"
+              inputMode="numeric"
+              pattern="\d{6}"
+              maxLength={6}
+              value={code}
+              onChange={(e) => setCode(e.target.value.replace(/\D/g, ''))}
+              autoComplete="one-time-code"
+              autoFocus
+              required
+            />
+          </label>
+
+          {error && <p className="admin-error">{error}</p>}
+
+          <button type="submit" disabled={pending || code.length !== 6}>
+            {pending ? 'Проверяем...' : 'Подтвердить'}
+          </button>
+
+          <button
+            type="button"
+            className="admin-login-back"
+            disabled={pending}
+            onClick={() => {
+              setStep('credentials');
+              setError(null);
+            }}
+          >
+            ← ввести email и пароль заново
+          </button>
+        </form>
+      </div>
+    );
+  }
+
   return (
     <div className="admin-login">
-      <form className="admin-login-form" onSubmit={handleSubmit}>
+      <form className="admin-login-form" onSubmit={requestCode}>
         <h1>LEGASHION — админка</h1>
 
         <label>
@@ -76,7 +149,7 @@ function LoginScreen({ onSuccess }) {
         {error && <p className="admin-error">{error}</p>}
 
         <button type="submit" disabled={pending}>
-          {pending ? 'Вход...' : 'Войти'}
+          {pending ? 'Отправляем код...' : 'Войти'}
         </button>
       </form>
     </div>

@@ -195,6 +195,22 @@
   font-size: 14px;
 }
 
+.admin-login-hint {
+  margin: -8px 0 4px;
+  font-size: 13px;
+  color: #71717a;
+}
+
+.admin-login-back {
+  background: none !important;
+  border: none !important;
+  padding: 0 !important;
+  font-size: 13px;
+  color: #71717a;
+  text-decoration: underline;
+  align-self: flex-start;
+}
+
 .admin-page label,
 .admin-login label {
   display: flex;

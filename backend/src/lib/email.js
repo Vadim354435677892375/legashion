@@ -85,6 +85,32 @@ export function buildEmailText(order) {
 }
 
 /**
+ * Отправляет админу одноразовый код входа (2FA после email+пароля).
+ * В отличие от notifyEmailNewOrder — бросает ошибку, если письмо не ушло:
+ * если код не дошёл, вход должен явно не удаться, а не тихо повиснуть.
+ * @param {string} to
+ * @param {string} code — 6 цифр
+ */
+export async function sendAdminLoginCode(to, code) {
+  const t = getTransporter();
+  if (!t) {
+    throw new Error('SMTP не настроен (SMTP_HOST) — отправка кода недоступна');
+  }
+
+  await t.sendMail({
+    from: process.env.SMTP_USER,
+    to,
+    subject: `${code} — код входа в админку legashion`,
+    text: `Код для входа в админку legashion: ${code}\n\nКод действует 10 минут. Если это были не вы — просто проигнорируйте письмо.`,
+    html: `
+      <p>Код для входа в админку legashion:</p>
+      <p style="font-size:28px;font-weight:bold;letter-spacing:4px;">${e(code)}</p>
+      <p>Код действует 10 минут. Если это были не вы — просто проигнорируйте письмо.</p>
+    `,
+  });
+}
+
+/**
  * Отправляет email администратору о новом заказе.
  * ADMIN_EMAIL может содержать несколько адресов через запятую.
  * @param {import('@prisma/client').Order & { items: import('@prisma/client').OrderItem[] }} order

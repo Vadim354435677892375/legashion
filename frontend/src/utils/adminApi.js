@@ -128,21 +128,35 @@ export async function adminUploadMedia(file, { onProgress } = {}) {
   return publicUrl;
 }
 
-/**
- * Логин админа. Токен сразу сохраняется — дальше все adminGet/adminPost его подхватят.
- */
-export async function adminLogin(email, password) {
-  const response = await fetch(`${API_URL}/api/admin/auth/login`, {
+// Общий помощник для двух публичных (без токена) шагов логина — login и verify-code.
+async function publicAuthRequest(path, body) {
+  const response = await fetch(`${API_URL}${path}`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ email, password }),
+    body: JSON.stringify(body),
   });
 
   const data = await response.json().catch(() => null);
   if (!response.ok) {
     throw new ApiError(response.status, data?.error || 'Не удалось войти', data?.details);
   }
+  return data;
+}
 
+/**
+ * Шаг 1 логина: email + пароль. Токен ещё не выдаётся — сервер шлёт код на
+ * почту и возвращает verificationId, который нужно передать в adminVerifyCode.
+ */
+export function adminLogin(email, password) {
+  return publicAuthRequest('/api/admin/auth/login', { email, password });
+}
+
+/**
+ * Шаг 2 логина: код из письма. При успехе токен сразу сохраняется —
+ * дальше все adminGet/adminPost его подхватят.
+ */
+export async function adminVerifyCode(verificationId, code) {
+  const data = await publicAuthRequest('/api/admin/auth/verify-code', { verificationId, code });
   setToken(data.token);
   return data;
 }
