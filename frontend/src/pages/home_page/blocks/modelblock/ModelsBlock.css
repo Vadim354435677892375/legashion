@@ -22,16 +22,90 @@
   top: 14.95%;
   width: 87.11%;
   height: 69.33%;
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
+  box-sizing: border-box;
+  display: flex;
   gap: 1.5%;
   padding: 1%;
+  overflow-x: auto;
+  overflow-y: hidden;
+  scroll-snap-type: x proximity;
+  scroll-padding: 0 1%;
+  /* родной скроллбар прячем — вместо него работает синий ползунок окна Paint */
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+  -webkit-overflow-scrolling: touch;
+}
+
+.paint-canvas-overlay::-webkit-scrollbar {
+  display: none;
 }
 
 .paint-photo {
   position: relative;
+  flex: 0 0 calc((100% - 3%) / 3);
+  scroll-snap-align: start;
   background: #d9d9d9;
   background-size: cover;
   background-position: center;
   border: 1px solid #b3b3b3;
+}
+
+/* Горизонтальный скроллбар: ложится поверх нарисованного на скриншоте
+   (координаты — от размеров paint-frame.png 1153×648) */
+.paint-scroll-track {
+  position: absolute;
+  left: 11.62%;
+  top: 84.72%;
+  width: 82.56%;
+  height: 3.86%;
+  background: linear-gradient(#f3efe6, #fcfdf8);
+  touch-action: none;
+}
+
+.paint-scroll-thumb {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  box-sizing: border-box;
+  border: 1px solid #b6c4e2;
+  border-radius: 2px;
+  background: linear-gradient(#dbe6fd, #c5d5f9 55%, #bccdf2);
+  cursor: pointer;
+  touch-action: none;
+}
+
+/* «ребристый» значок посередине ползунка, как в Windows XP */
+.paint-scroll-thumb::after {
+  content: '';
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: 7px;
+  height: 7px;
+  transform: translate(-50%, -50%);
+  background: repeating-linear-gradient(90deg, #8ea2cc 0 1px, transparent 1px 2px);
+}
+
+/* Прозрачные кнопки-стрелки поверх нарисованных */
+.paint-scroll-arrow {
+  position: absolute;
+  top: 84.72%;
+  width: 2.34%;
+  height: 3.86%;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  cursor: pointer;
+}
+
+.paint-scroll-arrow:disabled {
+  cursor: default;
+}
+
+.paint-scroll-arrow--left {
+  left: 9.1%;
+}
+
+.paint-scroll-arrow--right {
+  left: 94.37%;
 }
