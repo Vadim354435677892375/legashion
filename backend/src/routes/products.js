@@ -10,6 +10,8 @@ const productInclude = {
   collections: { include: { collection: true } },
 };
 
+// Публичный ответ собирается явным списком полей (whitelist): вес и габариты товара
+// (weightGrams/lengthCm/widthCm/heightCm) сюда добавлять НЕЛЬЗЯ — они только для админки и доставки.
 function serializeProduct(product) {
   return {
     id: product.id,

@@ -124,6 +124,15 @@ export default function ProductsTab() {
                 {product.sizes?.length > 0 ? `Размеры: ${product.sizes.join(', ')}` : 'Без размеров'}
               </p>
 
+              {(product.weightGrams == null ||
+                product.lengthCm == null ||
+                product.widthCm == null ||
+                product.heightCm == null) && (
+                <p className="admin-card-meta admin-error">
+                  не заполнены вес/габариты — доставку не рассчитать
+                </p>
+              )}
+
               {!product.isActive && <span className="admin-badge">выключен</span>}
             </div>
 

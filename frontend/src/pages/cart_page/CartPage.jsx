@@ -30,7 +30,7 @@ export default function CartPage() {
       <h1 className="cart-title">корзина</h1>
 
       {items.length === 0 ? (
-        <p className="cart-empty">Корзина пуста. Загляните в каталог, чтобы что-нибудь выбрать.</p>
+        <p className="cart-empty">В корзине пусто.Загляни в каталог и добавь то, что так долго хотел</p>
       ) : (
         <>
           <div className="cart-table-head">

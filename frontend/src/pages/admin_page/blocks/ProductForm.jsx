@@ -13,6 +13,10 @@ const EMPTY = {
   discountPercent: '0',
   description: '',
   isActive: true,
+  weightGrams: '',
+  lengthCm: '',
+  widthCm: '',
+  heightCm: '',
   sizes: [...DEFAULT_SIZES],
   collectionSlugs: [],
   imageUrls: [],
@@ -26,6 +30,11 @@ function toFormState(product) {
     discountPercent: String(product.discountPercent),
     description: product.description ?? '',
     isActive: product.isActive,
+    // у товаров, созданных до появления этих полей, значения null → пустое поле
+    weightGrams: product.weightGrams == null ? '' : String(product.weightGrams),
+    lengthCm: product.lengthCm == null ? '' : String(product.lengthCm),
+    widthCm: product.widthCm == null ? '' : String(product.widthCm),
+    heightCm: product.heightCm == null ? '' : String(product.heightCm),
     sizes: [...(product.sizes ?? [])],
     collectionSlugs: [...product.collectionSlugs],
     imageUrls: product.images.map((img) => img.url),
@@ -116,6 +125,11 @@ export default function ProductForm({ product, collections, onCancel, onSaved })
       discountPercent: Number(form.discountPercent) || 0,
       description: form.description.trim() || null,
       isActive: form.isActive,
+      // пустая строка → NaN → бэкенд ответит понятной ошибкой «укажите число»
+      weightGrams: form.weightGrams === '' ? null : Number(form.weightGrams),
+      lengthCm: form.lengthCm === '' ? null : Number(form.lengthCm),
+      widthCm: form.widthCm === '' ? null : Number(form.widthCm),
+      heightCm: form.heightCm === '' ? null : Number(form.heightCm),
       sizes: form.sizes,
       collectionSlugs: form.collectionSlugs,
       imageUrls: form.imageUrls,
@@ -190,6 +204,66 @@ export default function ProductForm({ product, collections, onCancel, onSaved })
             onChange={(e) => update({ description: e.target.value })}
           />
         </label>
+
+        <fieldset className="admin-fieldset">
+          <legend>Вес и габариты для доставки</legend>
+          <p className="admin-muted">
+            Только для расчёта доставки и оформления отправления в СДЭК — на сайте покупатели
+            этого не видят. Указывайте вес и размеры товара <strong>в упаковке</strong>, за одну
+            штуку.
+          </p>
+          <div className="admin-form-row">
+            <label>
+              Вес, г
+              <input
+                type="number"
+                min="1"
+                max="100000"
+                step="1"
+                value={form.weightGrams}
+                onChange={(e) => update({ weightGrams: e.target.value })}
+                placeholder="500"
+                required
+              />
+            </label>
+            <label>
+              Длина, см
+              <input
+                type="number"
+                min="1"
+                max="300"
+                step="1"
+                value={form.lengthCm}
+                onChange={(e) => update({ lengthCm: e.target.value })}
+                required
+              />
+            </label>
+            <label>
+              Ширина, см
+              <input
+                type="number"
+                min="1"
+                max="300"
+                step="1"
+                value={form.widthCm}
+                onChange={(e) => update({ widthCm: e.target.value })}
+                required
+              />
+            </label>
+            <label>
+              Высота, см
+              <input
+                type="number"
+                min="1"
+                max="300"
+                step="1"
+                value={form.heightCm}
+                onChange={(e) => update({ heightCm: e.target.value })}
+                required
+              />
+            </label>
+          </div>
+        </fieldset>
 
         <fieldset className="admin-fieldset">
           <legend>Коллекции</legend>

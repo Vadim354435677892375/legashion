@@ -20,6 +20,10 @@ function serializeProduct(product) {
     description: product.description,
     isActive: product.isActive,
     sizes: product.sizes,
+    weightGrams: product.weightGrams,
+    lengthCm: product.lengthCm,
+    widthCm: product.widthCm,
+    heightCm: product.heightCm,
     images: product.images.map((img) => ({ id: img.id, url: img.url })),
     collectionSlugs: product.collections.map((pc) => pc.collection.slug),
     createdAt: product.createdAt,
@@ -92,6 +96,10 @@ adminProductsRouter.post(
           description: data.description || null,
           isActive: data.isActive,
           sizes: data.sizes,
+          weightGrams: data.weightGrams,
+          lengthCm: data.lengthCm,
+          widthCm: data.widthCm,
+          heightCm: data.heightCm,
         },
       });
       await syncCollectionsAndImages(tx, created.id, data);
@@ -121,6 +129,10 @@ adminProductsRouter.put(
           description: data.description || null,
           isActive: data.isActive,
           sizes: data.sizes,
+          weightGrams: data.weightGrams,
+          lengthCm: data.lengthCm,
+          widthCm: data.widthCm,
+          heightCm: data.heightCm,
         },
       });
       await syncCollectionsAndImages(tx, id, data);
