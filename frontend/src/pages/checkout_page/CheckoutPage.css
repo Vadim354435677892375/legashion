@@ -78,6 +78,38 @@
   color: #1a1a1a;
 }
 
+.checkout-summary {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 16px 18px;
+  border: 2px solid #0a0a0a;
+  border-radius: 4px;
+  background: linear-gradient(to bottom, #f4f4f4, #e2e2e2);
+  font-family: var(--font-main);
+  font-size: 14px;
+}
+
+.checkout-summary-row {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 12px;
+  text-transform: uppercase;
+}
+
+.checkout-summary-discount {
+  color: #1a6b2a;
+  font-weight: 600;
+}
+
+.checkout-summary-total {
+  padding-top: 8px;
+  border-top: 2px solid #0a0a0a;
+  font-size: 17px;
+  font-weight: 700;
+}
+
 .checkout-submitted-note {
   padding: 14px 16px;
   border: 2px solid #163a7a;

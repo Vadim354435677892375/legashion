@@ -109,6 +109,7 @@ export default function ProductPage() {
           <Gallery images={product?.images ?? []} />
           <SystemMessage
             details={{ density: product?.density ?? '—', composition: product?.composition ?? '—' }}
+            sizes={product?.sizes ?? []}
             onAddToCart={handleAddToCart}
           />
         </>

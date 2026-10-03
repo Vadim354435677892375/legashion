@@ -18,6 +18,7 @@ function serializeProduct(product) {
     discountPercent: product.discountPercent,
     density: product.density,
     composition: product.composition,
+    sizes: product.sizes,
     images: product.images.map((img) => img.url),
     collections: product.collections.map((pc) => pc.collection.slug),
   };

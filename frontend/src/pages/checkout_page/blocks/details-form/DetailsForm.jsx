@@ -1,12 +1,10 @@
 import AddressAutocomplete from './AddressAutocomplete';
 import CountrySelect from './CountrySelect';
 import PhoneField from './PhoneField';
+import PromoCodeField from './PromoCodeField';
 import './DetailsForm.css';
 
-const TEXT_FIELDS_AFTER = [
-  { name: 'comment', label: 'комментарий' },
-  { name: 'promoCode', label: 'промокод' },
-];
+const TEXT_FIELDS_AFTER = [{ name: 'comment', label: 'комментарий' }];
 
 function TextField({ field, values, onChange, errors }) {
   return (
@@ -34,7 +32,9 @@ function TextField({ field, values, onChange, errors }) {
 // onChange(name, value) — для обычных текстовых полей, страны и телефона
 // onAddressChange(name, value, { selected, data }) — для города/адреса (подсказки)
 // errors — { [name]: 'текст ошибки' }
-export default function DetailsForm({ values, onChange, onAddressChange, errors }) {
+// items — товары корзины, нужны промокоду для проверки на лету (см. PromoCodeField)
+// onPromoResult(data | null) — результат проверки промокода, наверх для итоговой суммы
+export default function DetailsForm({ values, onChange, onAddressChange, errors, items, onPromoResult }) {
   return (
     <section className="checkout-section">
       <div className="checkout-section-header">
@@ -97,6 +97,13 @@ export default function DetailsForm({ values, onChange, onAddressChange, errors 
         {TEXT_FIELDS_AFTER.map((field) => (
           <TextField key={field.name} field={field} values={values} onChange={onChange} errors={errors} />
         ))}
+
+        <PromoCodeField
+          value={values.promoCode}
+          onChange={(value) => onChange('promoCode', value)}
+          items={items}
+          onResult={onPromoResult}
+        />
       </div>
     </section>
   );

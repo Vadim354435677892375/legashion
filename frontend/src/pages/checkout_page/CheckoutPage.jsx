@@ -4,6 +4,7 @@ import { useCart } from '../../context/CartContext';
 import { DEFAULT_COUNTRY_CODE } from '../../utils/countries';
 import { DEFAULT_PHONE_CODE, PHONE_CODES } from '../../utils/phoneCodes';
 import { apiPost, ApiError } from '../../utils/api';
+import { formatPrice } from '../../utils/pricing';
 import defaultLogo from '../../assets/logo-glitch.gif';
 import { useSiteMedia } from '../../hooks/useSiteMedia';
 import DeliveryBlock from './blocks/delivery/DeliveryBlock';
@@ -43,7 +44,7 @@ const PAYMENT_METHOD_TO_API = { card: 'CARD', sbp: 'SBP' };
 // POST /api/orders, бэкенд сам сохраняет его и уведомляет администратора
 // в Telegram и на почту (см. backend/src/routes/orders.js).
 export default function CheckoutPage() {
-  const { items, totalCount, clearCart } = useCart();
+  const { items, totalCount, totalPrice, clearCart } = useCart();
   const logo = useSiteMedia().get('brand.logo', defaultLogo);
   const navigate = useNavigate();
 
@@ -54,6 +55,10 @@ export default function CheckoutPage() {
   const [errors, setErrors] = useState({});
   const [submitting, setSubmitting] = useState(false);
   const [submittedOrderNumber, setSubmittedOrderNumber] = useState(null);
+  // Результат последней успешной проверки промокода (POST /api/promo-codes/validate),
+  // см. PromoCodeField. null — промокод не введён/не прошёл проверку: тогда
+  // итоговая сумма — просто totalPrice корзины, без скидки.
+  const [promo, setPromo] = useState(null);
 
   const handleDetailsChange = (name, value) => {
     setDetails((prev) => {
@@ -150,6 +155,7 @@ export default function CheckoutPage() {
       });
 
       clearCart();
+      setPromo(null);
       setSubmittedOrderNumber(order.orderNumber);
     } catch (err) {
       const message =
@@ -182,6 +188,8 @@ export default function CheckoutPage() {
           onChange={handleDetailsChange}
           onAddressChange={handleAddressChange}
           errors={errors}
+          items={items}
+          onPromoResult={setPromo}
         />
 
         <PaymentBlock
@@ -191,6 +199,27 @@ export default function CheckoutPage() {
           onAgreementChange={handleAgreementChange}
           errors={errors}
         />
+
+        <div className="checkout-summary">
+          <div className="checkout-summary-row">
+            <span>
+              {totalCount} {pluralizeItems(totalCount)}
+            </span>
+            <span>{formatPrice(promo ? promo.subtotal : totalPrice)}</span>
+          </div>
+
+          {promo && (
+            <div className="checkout-summary-row checkout-summary-discount">
+              <span>промокод {promo.code}</span>
+              <span>−{formatPrice(promo.discountAmount)}</span>
+            </div>
+          )}
+
+          <div className="checkout-summary-row checkout-summary-total">
+            <span>итого</span>
+            <span>{formatPrice(promo ? promo.totalPrice : totalPrice)}</span>
+          </div>
+        </div>
 
         {submittedOrderNumber && (
           <p className="checkout-submitted-note">
