@@ -8,7 +8,7 @@ import FadeBg from '../../../../components/FadeBg';
 // а поверх белого холста этого скриншота накладываются фото моделей.
 // mediaKey: ключ слота с фото — загружается в админке (Медиа → «Главная — фото моделей»).
 // Первые 3 фото показываются всегда (пока фото нет — светлый плейсхолдер), остальные —
-// только если загружены. Если фото больше трёх, их можно листать вправо синим ползунком
+// только если загружены. Фото шире окна, поэтому их листают вправо синим ползунком
 // внизу окна (тянуть ползунок, кликать по стрелкам и по дорожке; на телефоне — свайпом).
 const ALWAYS_VISIBLE = 3;
 const MODELS = [1, 2, 3, 4, 5, 6].map((n) => ({ mediaKey: `models.look-${n}`, alt: `Look ${n}` }));
@@ -50,7 +50,7 @@ export default function ModelsBlock() {
     const el = scrollerRef.current;
     if (!el) return;
     // шаг — одно фото
-    const step = el.firstElementChild ? el.firstElementChild.getBoundingClientRect().width : el.clientWidth / 3;
+    const step = el.firstElementChild ? el.firstElementChild.getBoundingClientRect().width : el.clientWidth / 2;
     el.scrollBy({ left: dir * step, behavior: 'smooth' });
   };
 
@@ -81,7 +81,7 @@ export default function ModelsBlock() {
     if (!thumb || e.target !== e.currentTarget) return;
     const rect = e.currentTarget.getBoundingClientRect();
     const clickPct = ((e.clientX - rect.left) / rect.width) * 100;
-    scrollByPage(clickPct < thumb.left ? -3 : 3);
+    scrollByPage(clickPct < thumb.left ? -2 : 2);
   };
 
   return (
