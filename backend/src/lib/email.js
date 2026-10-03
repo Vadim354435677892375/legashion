@@ -46,6 +46,7 @@ export function buildEmailHtml(order) {
     <h2>Новый заказ ${e(order.orderNumber)}</h2>
     <p><b>Клиент:</b> ${e(order.fullName)}<br/>
     <b>Телефон:</b> ${e(formatPhone(order))}<br/>
+    ${order.email ? `<b>Email:</b> ${e(order.email)}<br/>` : ''}
     <b>Доставка:</b> ${e(DELIVERY_LABELS[order.deliveryType] ?? order.deliveryType)}<br/>
     <b>Оплата:</b> ${e(PAYMENT_LABELS[order.paymentMethod] ?? order.paymentMethod)}<br/>
     <b>Город:</b> ${e(order.city)}<br/>
@@ -68,6 +69,7 @@ export function buildEmailText(order) {
     '',
     `Клиент: ${order.fullName}`,
     `Телефон: ${formatPhone(order)}`,
+    order.email ? `Email: ${order.email}` : null,
     `Доставка: ${DELIVERY_LABELS[order.deliveryType] ?? order.deliveryType}`,
     `Оплата: ${PAYMENT_LABELS[order.paymentMethod] ?? order.paymentMethod}`,
     `Город: ${order.city}`,

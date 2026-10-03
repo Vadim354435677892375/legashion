@@ -91,6 +91,7 @@ export default function OrdersTab() {
 
             <p>
               {order.fullName} · +{order.phoneCallingCode} {order.phone}
+              {order.email ? ` · ${order.email}` : ''}
             </p>
             <p className="admin-muted">
               {order.countryCode}, {order.city}, {order.address}

@@ -19,7 +19,7 @@ export function createFakePrisma() {
     }
   };
 
-  return {
+  const fake = {
     _db: db,
 
     admin: {
@@ -69,6 +69,8 @@ export function createFakePrisma() {
         db.orders.push(order);
         return order;
       },
+      findUnique: async ({ where }) =>
+        db.orders.find((o) => o.orderNumber === where.orderNumber) ?? null,
     },
 
     // --- раздел «Медиа» ---
@@ -140,7 +142,9 @@ export function createFakePrisma() {
       },
     },
 
-    // Массив уже запущенных операций — для имитации достаточно дождаться их всех.
-    $transaction: async (ops) => Promise.all(ops),
+    // Два вида вызова: массив уже запущенных операций (достаточно дождаться их всех)
+    // и интерактивная транзакция — функция, которой отдаём тот же fake-клиент.
+    $transaction: async (arg) => (typeof arg === 'function' ? arg(fake) : Promise.all(arg)),
   };
+  return fake;
 }

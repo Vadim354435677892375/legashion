@@ -27,7 +27,7 @@ function TextField({ field, values, onChange, errors }) {
 }
 
 // Блок «2. Введите данные».
-// values — { fullName, phoneCallingCode, phone, countryCode, city, citySelected, cityData,
+// values — { fullName, phoneCallingCode, phone, email, countryCode, city, citySelected, cityData,
 //            address, addressSelected, comment, promoCode }
 // onChange(name, value) — для обычных текстовых полей, страны и телефона
 // onAddressChange(name, value, { selected, data }) — для города/адреса (подсказки)
@@ -57,6 +57,13 @@ export default function DetailsForm({ values, onChange, onAddressChange, errors,
           onPhoneChange={(value) => onChange('phone', value)}
           hasError={!!errors?.phone}
           errorText={errors?.phone}
+        />
+
+        <TextField
+          field={{ name: 'email', label: 'email', type: 'email', autoComplete: 'email' }}
+          values={values}
+          onChange={onChange}
+          errors={errors}
         />
 
         <CountrySelect

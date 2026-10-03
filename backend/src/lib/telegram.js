@@ -31,6 +31,7 @@ export function buildTelegramText(order) {
       '',
       `Клиент: ${esc(order.fullName, 150)}`,
       `Телефон: ${esc(formatPhone(order), 40)}`,
+      order.email ? `Email: ${esc(order.email, 254)}` : null,
       `Доставка: ${esc(DELIVERY_LABELS[order.deliveryType] ?? order.deliveryType)}`,
       `Оплата: ${esc(PAYMENT_LABELS[order.paymentMethod] ?? order.paymentMethod)}`,
       `Город: ${esc(order.city, 150)}`,

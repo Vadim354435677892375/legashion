@@ -7,6 +7,7 @@ export const createOrderSchema = z.object({
   fullName: z.string().trim().min(1, 'Укажите ФИО'),
   phoneCallingCode: z.string().trim().min(1),
   phone: z.string().trim().min(1, 'Укажите телефон'),
+  email: z.string().trim().toLowerCase().max(254, 'Слишком длинный email').email('Укажите корректный email'),
   countryCode: z.string().trim().length(2),
   city: z.string().trim().min(1, 'Укажите город доставки'),
   cityData: z.any().optional(),

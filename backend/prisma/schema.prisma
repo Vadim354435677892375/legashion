@@ -168,6 +168,7 @@ model Order {
   fullName         String
   phoneCallingCode String
   phone            String
+  email            String? // у заказов, оформленных до появления поля, — null
   countryCode      String
   city             String
   cityData         Json?

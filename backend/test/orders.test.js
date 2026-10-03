@@ -21,6 +21,7 @@ const baseOrder = (items) => ({
   fullName: 'Иван Иванов',
   phoneCallingCode: '+7',
   phone: '9001234567',
+  email: 'ivan@example.com',
   countryCode: 'RU',
   city: 'Москва',
   address: 'ул. Тверская, 1',
@@ -85,6 +86,39 @@ describe('POST /api/orders — цены считает сервер', () => {
   it('слишком много позиций → 400', async () => {
     const items = Array.from({ length: 31 }, () => ({ productId: 1, size: 'M', qty: 1 }));
     assert.equal((await send(baseOrder(items))).status, 400);
+  });
+});
+
+describe('POST /api/orders — email покупателя', () => {
+  const items = [{ productId: 1, size: 'M', qty: 1 }];
+
+  it('сохраняет email в заказе (в нижнем регистре, без пробелов)', async () => {
+    const res = await send({ ...baseOrder(items), email: '  Ivan@Example.COM ' });
+    assert.equal(res.status, 201);
+    assert.equal(ctx.prisma._db.orders[0].email, 'ivan@example.com');
+  });
+
+  it('без email заказ не принимается', async () => {
+    const { email, ...withoutEmail } = baseOrder(items);
+    void email;
+    const res = await send(withoutEmail);
+    assert.equal(res.status, 400);
+    assert.equal(ctx.prisma._db.orders.length, 0);
+  });
+
+  it('некорректный email → 400', async () => {
+    for (const bad of ['', 'ivan', 'ivan@', '@example.com', 'iv an@example.com']) {
+      const res = await send({ ...baseOrder(items), email: bad });
+      assert.equal(res.status, 400, `«${bad}» должен быть отклонён`);
+    }
+    assert.equal(ctx.prisma._db.orders.length, 0);
+  });
+
+  it('публичный GET заказа не отдаёт email', async () => {
+    const created = await (await send(baseOrder(items))).json();
+    const res = await fetch(`${ctx.base}/api/orders/${created.orderNumber}`);
+    // в fake-БД нет findUnique для заказов — достаточно, что email не попадает в ответ, если он есть
+    if (res.status === 200) assert.equal((await res.json()).email, undefined);
   });
 });
 

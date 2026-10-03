@@ -42,6 +42,7 @@ ordersRouter.post(
           fullName: data.fullName,
           phoneCallingCode: data.phoneCallingCode,
           phone: data.phone,
+          email: data.email,
           countryCode: data.countryCode,
           city: data.city,
           cityData: data.cityData ?? undefined,

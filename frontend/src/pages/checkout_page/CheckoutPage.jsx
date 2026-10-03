@@ -21,10 +21,14 @@ function pluralizeItems(count) {
   return 'товаров';
 }
 
+// Простая проверка формата «что-то@домен.зона»; строгую проверку делает бэкенд (zod).
+const EMAIL_PATTERN = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
 const INITIAL_DETAILS = {
   fullName: '',
   phoneCallingCode: DEFAULT_PHONE_CODE.callingCode, // '7' — Россия, по стандарту магазина
   phone: '',
+  email: '',
   countryCode: DEFAULT_COUNTRY_CODE,
   city: '',
   citySelected: false,
@@ -114,6 +118,11 @@ export default function CheckoutPage() {
         nextErrors.phone = `Для +${phoneCountry.callingCode} номер должен содержать ${expected} цифр`;
       }
     }
+    if (!details.email.trim()) {
+      nextErrors.email = 'Укажите email';
+    } else if (!EMAIL_PATTERN.test(details.email.trim())) {
+      nextErrors.email = 'Укажите корректный email';
+    }
     if (!details.city.trim()) {
       nextErrors.city = 'Укажите город доставки';
     } else if (!details.citySelected) {
@@ -141,6 +150,7 @@ export default function CheckoutPage() {
         fullName: details.fullName.trim(),
         phoneCallingCode: details.phoneCallingCode,
         phone: details.phone,
+        email: details.email.trim(),
         countryCode: details.countryCode,
         city: details.city,
         cityData: details.cityData,
