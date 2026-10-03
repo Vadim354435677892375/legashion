@@ -120,6 +120,10 @@ export default function ProductsTab() {
                   : 'без коллекций — на сайте не появится'}
               </p>
 
+              <p className="admin-card-meta">
+                {product.sizes?.length > 0 ? `Размеры: ${product.sizes.join(', ')}` : 'Без размеров'}
+              </p>
+
               {!product.isActive && <span className="admin-badge">выключен</span>}
             </div>
 

@@ -4,7 +4,7 @@ import { prisma } from '../lib/prisma.js';
 import { asyncHandler } from '../middleware/asyncHandler.js';
 import { HttpError } from '../middleware/errorHandler.js';
 import { createOrderSchema } from '../schemas/order.js';
-import { getDiscountedPrice } from '../lib/pricing.js';
+import { priceOrderItems, resolvePromo } from '../lib/orderPricing.js';
 import { notifyTelegramNewOrder } from '../lib/telegram.js';
 import { notifyEmailNewOrder } from '../lib/email.js';
 
@@ -25,48 +25,44 @@ ordersRouter.post(
   asyncHandler(async (req, res) => {
     const data = createOrderSchema.parse(req.body);
 
-    // Цены считаем на сервере по актуальному каталогу — цифрам от клиента не доверяем.
-    const productIds = [...new Set(data.items.map((i) => i.productId))];
-    const products = await prisma.product.findMany({
-      where: { id: { in: productIds }, isActive: true },
-    });
-    const productById = new Map(products.map((p) => [p.id, p]));
+    // Цены и размеры считаем на сервере по актуальному каталогу — данным от клиента не доверяем.
+    const { items, subtotal } = await priceOrderItems(data.items);
 
-    const items = data.items.map((i) => {
-      const product = productById.get(i.productId);
-      if (!product) {
-        throw new HttpError(400, 'Один из товаров в корзине больше недоступен. Обновите корзину');
+    // Промокод (если указан) находим и проверяем здесь же, а не в транзакции ниже:
+    // ошибка «код не найден»/«истёк» должна вернуться клиенту без создания заказа.
+    const { promo, discountAmount } = await resolvePromo(data.promoCode, subtotal);
+    const totalPrice = subtotal - discountAmount;
+
+    // Создание заказа и увеличение счётчика использований промокода — одной транзакцией,
+    // чтобы при гонке двух заказов с одним кодом usedCount не разъехался с реальным числом заказов.
+    const order = await prisma.$transaction(async (tx) => {
+      const created = await tx.order.create({
+        data: {
+          orderNumber: generateOrderNumber(),
+          fullName: data.fullName,
+          phoneCallingCode: data.phoneCallingCode,
+          phone: data.phone,
+          countryCode: data.countryCode,
+          city: data.city,
+          cityData: data.cityData ?? undefined,
+          address: data.address,
+          addressData: data.addressData ?? undefined,
+          comment: data.comment || null,
+          promoCode: promo ? promo.code : null,
+          discountAmount,
+          deliveryType: data.deliveryType,
+          paymentMethod: data.paymentMethod,
+          totalPrice,
+          items: { create: items },
+        },
+        include: { items: true },
+      });
+
+      if (promo) {
+        await tx.promoCode.update({ where: { id: promo.id }, data: { usedCount: { increment: 1 } } });
       }
-      return {
-        productId: product.id,
-        name: product.name,
-        size: i.size ?? null,
-        price: getDiscountedPrice(product.price, product.discountPercent),
-        qty: i.qty,
-      };
-    });
 
-    const totalPrice = items.reduce((sum, i) => sum + i.price * i.qty, 0);
-
-    const order = await prisma.order.create({
-      data: {
-        orderNumber: generateOrderNumber(),
-        fullName: data.fullName,
-        phoneCallingCode: data.phoneCallingCode,
-        phone: data.phone,
-        countryCode: data.countryCode,
-        city: data.city,
-        cityData: data.cityData ?? undefined,
-        address: data.address,
-        addressData: data.addressData ?? undefined,
-        comment: data.comment || null,
-        promoCode: data.promoCode || null,
-        deliveryType: data.deliveryType,
-        paymentMethod: data.paymentMethod,
-        totalPrice,
-        items: { create: items },
-      },
-      include: { items: true },
+      return created;
     });
 
     // Уведомления не должны валить успешный ответ клиенту, если, скажем,
@@ -91,6 +87,7 @@ ordersRouter.post(
     res.status(201).json({
       orderNumber: order.orderNumber,
       totalPrice: order.totalPrice,
+      discountAmount: order.discountAmount,
       status: order.status,
     });
   })
@@ -111,6 +108,7 @@ ordersRouter.get(
       orderNumber: order.orderNumber,
       status: order.status,
       totalPrice: order.totalPrice,
+      discountAmount: order.discountAmount,
       deliveryType: order.deliveryType,
       paymentMethod: order.paymentMethod,
       items: order.items.map((i) => ({ name: i.name, size: i.size, price: i.price, qty: i.qty })),

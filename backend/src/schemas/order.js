@@ -23,10 +23,18 @@ export const createOrderSchema = z.object({
     .array(
       z.object({
         productId: z.number().int().positive(),
-        size: z.enum(['S', 'M', 'L', 'XL']).optional().nullable(),
+        // допустимые размеры зависят от товара — сервер сверяет их с product.sizes (lib/orderPricing.js)
+        size: z.string().trim().min(1).max(20).optional().nullable(),
         qty: z.number().int().positive().max(20, 'Не больше 20 штук одной позиции'),
       })
     )
     .min(1, 'Корзина пуста')
     .max(30, 'Слишком много позиций в заказе'),
+});
+
+// Предпросмотр скидки на чекауте (POST /api/promo-codes/validate): сервер сам считает
+// сумму корзины по каталогу и применяет к ней промокод.
+export const validatePromoSchema = z.object({
+  code: z.string().trim().min(1, 'Введите промокод').max(64),
+  items: createOrderSchema.shape.items,
 });

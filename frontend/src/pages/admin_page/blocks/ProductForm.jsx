@@ -1,5 +1,6 @@
 import { useRef, useState } from 'react';
 import { adminPost, adminPut, adminUploadImage } from '../../../utils/adminApi';
+import { AVAILABLE_SIZES, DEFAULT_SIZES } from '../../../utils/sizes';
 
 // Форма создания/редактирования товара. Тело запроса должно совпадать с
 // upsertProductSchema (backend/src/schemas/product.js): price и discountPercent —
@@ -13,6 +14,7 @@ const EMPTY = {
   density: '',
   composition: '',
   isActive: true,
+  sizes: [...DEFAULT_SIZES],
   collectionSlugs: [],
   imageUrls: [],
 };
@@ -26,6 +28,7 @@ function toFormState(product) {
     density: product.density ?? '',
     composition: product.composition ?? '',
     isActive: product.isActive,
+    sizes: [...(product.sizes ?? [])],
     collectionSlugs: [...product.collectionSlugs],
     imageUrls: product.images.map((img) => img.url),
   };
@@ -49,6 +52,14 @@ export default function ProductForm({ product, collections, onCancel, onSaved })
       collectionSlugs: form.collectionSlugs.includes(slug)
         ? form.collectionSlugs.filter((s) => s !== slug)
         : [...form.collectionSlugs, slug],
+    });
+  }
+
+  function toggleSize(size) {
+    update({
+      sizes: form.sizes.includes(size)
+        ? form.sizes.filter((s) => s !== size)
+        : [...form.sizes, size],
     });
   }
 
@@ -108,6 +119,7 @@ export default function ProductForm({ product, collections, onCancel, onSaved })
       density: form.density.trim() || null,
       composition: form.composition.trim() || null,
       isActive: form.isActive,
+      sizes: form.sizes,
       collectionSlugs: form.collectionSlugs,
       imageUrls: form.imageUrls,
     };
@@ -210,6 +222,26 @@ export default function ProductForm({ product, collections, onCancel, onSaved })
                   onChange={() => toggleCollection(collection.slug)}
                 />
                 {collection.title} <span className="admin-muted">({collection.slug})</span>
+              </label>
+            ))}
+          </div>
+        </fieldset>
+
+        <fieldset className="admin-fieldset">
+          <legend>Размеры</legend>
+          <p className="admin-muted">
+            Если не отметить ни один размер, товар будет заказываться без выбора размера
+            (подходит для аксессуаров).
+          </p>
+          <div className="admin-checks">
+            {AVAILABLE_SIZES.map((size) => (
+              <label key={size} className="admin-check">
+                <input
+                  type="checkbox"
+                  checked={form.sizes.includes(size)}
+                  onChange={() => toggleSize(size)}
+                />
+                {size}
               </label>
             ))}
           </div>

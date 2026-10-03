@@ -20,6 +20,7 @@ function serializeProduct(product) {
     density: product.density,
     composition: product.composition,
     isActive: product.isActive,
+    sizes: product.sizes,
     images: product.images.map((img) => ({ id: img.id, url: img.url })),
     collectionSlugs: product.collections.map((pc) => pc.collection.slug),
     createdAt: product.createdAt,
@@ -92,6 +93,7 @@ adminProductsRouter.post(
           density: data.density || null,
           composition: data.composition || null,
           isActive: data.isActive,
+          sizes: data.sizes,
         },
       });
       await syncCollectionsAndImages(tx, created.id, data);
@@ -121,6 +123,7 @@ adminProductsRouter.put(
           density: data.density || null,
           composition: data.composition || null,
           isActive: data.isActive,
+          sizes: data.sizes,
         },
       });
       await syncCollectionsAndImages(tx, id, data);

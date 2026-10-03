@@ -92,6 +92,9 @@ model Product {
   density         String? // характеристика для System message на карточке товара
   composition     String?
   isActive        Boolean             @default(true) // выключенные товары не отдаются публичным API
+  // Доступные размеры (S/M/L/XL/...). Пустой массив — товар без размера (аксессуары и т.п.):
+  // на карточке выбор размера не показывается, заказать можно без него.
+  sizes           String[]            @default(["S", "M", "L", "XL"])
   createdAt       DateTime            @default(now())
   updatedAt       DateTime            @updatedAt
   images          ProductImage[]
@@ -116,6 +119,26 @@ model ProductCollection {
   collection   Collection @relation(fields: [collectionId], references: [id], onDelete: Cascade)
 
   @@id([productId, collectionId])
+}
+
+enum PromoDiscountType {
+  PERCENT // value — процент от суммы заказа (1–100)
+  FIXED // value — фиксированная скидка в рублях
+}
+
+// Промокоды создаются в админке (вкладка «Промокоды») и применяются в POST /api/orders.
+// code хранится в верхнем регистре — при вводе регистр не важен.
+model PromoCode {
+  id           Int               @id @default(autoincrement())
+  code         String            @unique
+  discountType PromoDiscountType @default(PERCENT)
+  value        Int
+  isActive     Boolean           @default(true)
+  expiresAt    DateTime? // null — бессрочный
+  maxUses      Int? // null — без ограничения числа использований
+  usedCount    Int               @default(0)
+  createdAt    DateTime          @default(now())
+  updatedAt    DateTime          @updatedAt
 }
 
 enum DeliveryType {
@@ -151,6 +174,7 @@ model Order {
   addressData      Json?
   comment          String?
   promoCode        String?
+  discountAmount   Int           @default(0) // скидка по промокоду в рублях (уже вычтена из totalPrice)
   deliveryType     DeliveryType
   paymentMethod    PaymentMethod
   status           OrderStatus   @default(NEW)

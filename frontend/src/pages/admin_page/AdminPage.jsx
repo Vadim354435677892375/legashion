@@ -4,6 +4,7 @@ import ProductsTab from './blocks/ProductsTab';
 import CollectionsTab from './blocks/CollectionsTab';
 import OrdersTab from './blocks/OrdersTab';
 import MediaTab from './blocks/MediaTab';
+import PromoCodesTab from './blocks/PromoCodesTab';
 import {
   adminLogin,
   adminLogout,
@@ -25,6 +26,7 @@ const TABS = [
   { id: 'collections', label: 'Коллекции' },
   { id: 'media', label: 'Медиа' },
   { id: 'orders', label: 'Заказы' },
+  { id: 'promo-codes', label: 'Промокоды' },
 ];
 
 // Вход в два шага: сначала email+пароль (POST /login), сервер в ответ шлёт
@@ -245,6 +247,7 @@ export default function AdminPage() {
         {tab === 'collections' && <CollectionsTab />}
         {tab === 'media' && <MediaTab />}
         {tab === 'orders' && <OrdersTab />}
+        {tab === 'promo-codes' && <PromoCodesTab />}
       </main>
     </div>
   );
