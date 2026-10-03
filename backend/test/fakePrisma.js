@@ -12,6 +12,16 @@ export function createFakePrisma() {
     nextId: 1,
   };
   const id = () => db.nextId++;
+  // Условия, которые код реально использует для товаров: id (число или { in }), isActive
+  // и числовые фильтры { gt } (вес/габариты). Остальное (фильтр по коллекции) не имитируем.
+  const matchesProduct = (p, where = {}) => {
+    if (typeof where.id === 'number' && p.id !== where.id) return false;
+    if (where.id?.in && !where.id.in.includes(p.id)) return false;
+    if (where.isActive !== undefined && p.isActive !== where.isActive) return false;
+    return ['weightGrams', 'lengthCm', 'widthCm', 'heightCm'].every(
+      (field) => where[field]?.gt === undefined || (p[field] ?? 0) > where[field].gt
+    );
+  };
   // Как уникальный индекс в Postgres: Prisma бросает ошибку с кодом P2002.
   const throwIfSlugTaken = (slug, exceptId) => {
     if (db.collections.some((c) => c.slug === slug && c.id !== exceptId)) {
@@ -51,10 +61,8 @@ export function createFakePrisma() {
     },
 
     product: {
-      findMany: async ({ where }) =>
-        db.products.filter(
-          (p) => where.id.in.includes(p.id) && (where.isActive === undefined || p.isActive === where.isActive)
-        ),
+      findMany: async ({ where }) => db.products.filter((p) => matchesProduct(p, where)),
+      findFirst: async ({ where }) => db.products.find((p) => matchesProduct(p, where)) ?? null,
     },
 
     order: {

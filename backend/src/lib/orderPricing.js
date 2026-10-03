@@ -1,5 +1,6 @@
 import { prisma } from './prisma.js';
 import { HttpError } from '../middleware/errorHandler.js';
+import { HAS_SHIPPING_DATA } from './shipping.js';
 import { getDiscountedPrice } from './pricing.js';
 import { assertPromoUsable, calcPromoDiscount, normalizePromoCode } from './promo.js';
 
@@ -12,7 +13,8 @@ import { assertPromoUsable, calcPromoDiscount, normalizePromoCode } from './prom
 export async function priceOrderItems(rawItems) {
   const productIds = [...new Set(rawItems.map((i) => i.productId))];
   const products = await prisma.product.findMany({
-    where: { id: { in: productIds }, isActive: true },
+    // товар без веса/габаритов на сайте скрыт — заказать его напрямую через API тоже нельзя
+    where: { id: { in: productIds }, isActive: true, ...HAS_SHIPPING_DATA },
   });
   const productById = new Map(products.map((p) => [p.id, p]));
 

@@ -10,10 +10,12 @@ after(() => ctx.close());
 
 beforeEach(() => {
   ctx.prisma._db.orders = [];
+  const dims = { weightGrams: 500, lengthCm: 30, widthCm: 25, heightCm: 5 };
   ctx.prisma._db.products = [
-    { id: 1, name: 'T-shirt "Eminem"', price: 1800, discountPercent: 0, isActive: true },
-    { id: 2, name: 'T-shirt "Sale"', price: 1800, discountPercent: 20, isActive: true },
-    { id: 3, name: 'Скрытый товар', price: 1000, discountPercent: 0, isActive: false },
+    { id: 1, name: 'T-shirt "Eminem"', price: 1800, discountPercent: 0, isActive: true, ...dims },
+    { id: 2, name: 'T-shirt "Sale"', price: 1800, discountPercent: 20, isActive: true, ...dims },
+    { id: 3, name: 'Скрытый товар', price: 1000, discountPercent: 0, isActive: false, ...dims },
+    { id: 4, name: 'Без габаритов', price: 1000, discountPercent: 0, isActive: true, weightGrams: 500, lengthCm: null, widthCm: 25, heightCm: 5 },
   ];
 });
 
@@ -72,6 +74,12 @@ describe('POST /api/orders — цены считает сервер', () => {
   it('выключенный (isActive=false) товар купить нельзя', async () => {
     const res = await send(baseOrder([{ productId: 3, size: 'M', qty: 1 }]));
     assert.equal(res.status, 400);
+  });
+
+  it('товар без веса/габаритов заказать нельзя', async () => {
+    const res = await send(baseOrder([{ productId: 4, size: 'M', qty: 1 }]));
+    assert.equal(res.status, 400);
+    assert.equal(ctx.prisma._db.orders.length, 0);
   });
 
   it('отрицательное и слишком большое количество → 400', async () => {

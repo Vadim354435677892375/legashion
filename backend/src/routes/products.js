@@ -2,6 +2,7 @@ import { Router } from 'express';
 import { prisma } from '../lib/prisma.js';
 import { asyncHandler } from '../middleware/asyncHandler.js';
 import { HttpError } from '../middleware/errorHandler.js';
+import { HAS_SHIPPING_DATA } from '../lib/shipping.js';
 
 export const productsRouter = Router();
 
@@ -35,6 +36,8 @@ productsRouter.get(
     const products = await prisma.product.findMany({
       where: {
         isActive: true,
+        // товар без веса/габаритов на сайте не показываем (см. lib/shipping.js)
+        ...HAS_SHIPPING_DATA,
         ...(collection ? { collections: { some: { collection: { slug: String(collection) } } } } : {}),
       },
       include: productInclude,
@@ -53,7 +56,7 @@ productsRouter.get(
     if (!Number.isInteger(id)) throw new HttpError(400, 'Некорректный id товара');
 
     const product = await prisma.product.findFirst({
-      where: { id, isActive: true },
+      where: { id, isActive: true, ...HAS_SHIPPING_DATA },
       include: productInclude,
     });
     if (!product) throw new HttpError(404, 'Товар не найден');
