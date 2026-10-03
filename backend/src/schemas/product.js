@@ -5,8 +5,7 @@ export const upsertProductSchema = z.object({
   name: z.string().trim().min(1, 'Укажите название'),
   price: z.number().int().positive('Цена должна быть положительным числом'),
   discountPercent: z.number().int().min(0).max(100).default(0),
-  density: z.string().trim().optional().nullable(),
-  composition: z.string().trim().optional().nullable(),
+  description: z.string().trim().optional().nullable(),
   isActive: z.boolean().default(true),
   // размеры, доступные для заказа; пустой массив — товар без размера
   sizes: z

@@ -11,8 +11,7 @@ const EMPTY = {
   name: '',
   price: '',
   discountPercent: '0',
-  density: '',
-  composition: '',
+  description: '',
   isActive: true,
   sizes: [...DEFAULT_SIZES],
   collectionSlugs: [],
@@ -25,8 +24,7 @@ function toFormState(product) {
     name: product.name,
     price: String(product.price),
     discountPercent: String(product.discountPercent),
-    density: product.density ?? '',
-    composition: product.composition ?? '',
+    description: product.description ?? '',
     isActive: product.isActive,
     sizes: [...(product.sizes ?? [])],
     collectionSlugs: [...product.collectionSlugs],
@@ -116,8 +114,7 @@ export default function ProductForm({ product, collections, onCancel, onSaved })
       name: form.name.trim(),
       price: Number(form.price),
       discountPercent: Number(form.discountPercent) || 0,
-      density: form.density.trim() || null,
-      composition: form.composition.trim() || null,
+      description: form.description.trim() || null,
       isActive: form.isActive,
       sizes: form.sizes,
       collectionSlugs: form.collectionSlugs,
@@ -185,27 +182,14 @@ export default function ProductForm({ product, collections, onCancel, onSaved })
           </label>
         </div>
 
-        <div className="admin-form-row">
-          <label>
-            Плотность
-            <input
-              type="text"
-              value={form.density}
-              onChange={(e) => update({ density: e.target.value })}
-              placeholder="320 г/м²"
-            />
-          </label>
-
-          <label>
-            Состав
-            <input
-              type="text"
-              value={form.composition}
-              onChange={(e) => update({ composition: e.target.value })}
-              placeholder="80% хлопок, 20% полиэстер"
-            />
-          </label>
-        </div>
+        <label>
+          Описание
+          <textarea
+            rows={4}
+            value={form.description}
+            onChange={(e) => update({ description: e.target.value })}
+          />
+        </label>
 
         <fieldset className="admin-fieldset">
           <legend>Коллекции</legend>
