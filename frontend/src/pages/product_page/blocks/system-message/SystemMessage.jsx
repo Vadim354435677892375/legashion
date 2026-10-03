@@ -70,7 +70,7 @@ function SizePicker({ sizes, value, onSelect, onClose }) {
 }
 
 // Блок «System message» — окно в стиле классического Windows с характеристиками товара.
-// details: { density: string, composition: string } — плотность и состав ткани.
+// description: string — описание товара из админки; если пусто — в окне ничего не выводится.
 // sizes: string[] — размеры этого товара (product.sizes с бэкенда). Пустой массив —
 // товар без размера (аксессуары и т.п.): выбор размера не показывается вовсе,
 // в корзину добавляется с size: null.
@@ -78,11 +78,10 @@ function SizePicker({ sizes, value, onSelect, onClose }) {
 // выбранный размер и сама кнопка (откуда стартует анимация полёта в корзину).
 // Выбор размера и кнопка «в корзину» находятся внутри этого же окна.
 // Закрывается по крестику; повторно открыть можно кнопкой-заглушкой снизу.
-export default function SystemMessage({ details = {}, sizes = [], onAddToCart }) {
+export default function SystemMessage({ description = '', sizes = [], onAddToCart }) {
   const [closed, setClosed] = useState(false);
   const [size, setSize] = useState(sizes[0] ?? null);
   const [pickerOpen, setPickerOpen] = useState(false);
-  const { density = '—', composition = '—' } = details;
   const hasSizes = sizes.length > 0;
 
   // Товар загружается асинхронно (GET /api/products/:id) — в момент первого рендера
@@ -118,8 +117,7 @@ export default function SystemMessage({ details = {}, sizes = [], onAddToCart })
         </button>
       </div>
       <div className="sysmsg-body">
-        <p>плотность- {density}</p>
-        <p>состав- {composition}</p>
+        {description.trim() && <p style={{ whiteSpace: 'pre-line' }}>{description}</p>}
 
         <div className="sysmsg-order">
           {hasSizes && (
