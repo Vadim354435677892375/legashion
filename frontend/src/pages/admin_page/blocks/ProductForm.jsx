@@ -210,7 +210,7 @@ export default function ProductForm({ product, collections, onCancel, onSaved })
           <p className="admin-muted">
             Только для расчёта доставки и оформления отправления в СДЭК — на сайте покупатели
             этого не видят. Указывайте вес и размеры товара <strong>в упаковке</strong>, за одну
-            штуку.
+            штуку. Пока все четыре значения не заполнены, товар не показывается на сайте.
           </p>
           <div className="admin-form-row">
             <label>

@@ -129,7 +129,7 @@ export default function ProductsTab() {
                 product.widthCm == null ||
                 product.heightCm == null) && (
                 <p className="admin-card-meta admin-error">
-                  не заполнены вес/габариты — доставку не рассчитать
+                  скрыт на сайте: не заполнены вес/габариты
                 </p>
               )}
 
