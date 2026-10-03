@@ -28,8 +28,6 @@
   padding: 1%;
   overflow-x: auto;
   overflow-y: hidden;
-  scroll-snap-type: x proximity;
-  scroll-padding: 0 1%;
   /* родной скроллбар прячем — вместо него работает синий ползунок окна Paint */
   scrollbar-width: none;
   -ms-overflow-style: none;
@@ -42,9 +40,8 @@
 
 .paint-photo {
   position: relative;
-  /* ~45% ширины холста: три фото чуть шире окна — есть что листать ползунком */
-  flex: 0 0 45%;
-  scroll-snap-align: start;
+  /* как раньше: в окне помещаются ровно три фото, остальные — за правым краем */
+  flex: 0 0 calc((100% - 3%) / 3);
   background: #d9d9d9;
   background-size: cover;
   background-position: center;
