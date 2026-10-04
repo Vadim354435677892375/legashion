@@ -68,8 +68,45 @@
   gap: 14px;
 }
 
+/* Ряд: кнопка выбора размера слева, цена товара справа от неё */
+.sysmsg-order-row {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 18px;
+  width: 100%;
+}
+
+.sysmsg-order-price {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 2px;
+  font-family: var(--font-main);
+  white-space: nowrap;
+}
+
+.sysmsg-order-price-value {
+  font-size: 18px;
+  font-weight: 700;
+  color: #1a1a1a;
+}
+
+/* Со скидкой: новая цена синяя, старая — мелкая зачёркнутая серая (как на карточке в списке) */
+.sysmsg-order-price-new {
+  color: #1e6fd9;
+}
+
+.sysmsg-order-price-old {
+  font-size: 13px;
+  color: #7a7a7a;
+  text-decoration: line-through;
+}
+
 /* Кнопка, показывающая выбранный размер и открывающая окно выбора */
 .sysmsg-order-size {
+  flex: 0 1 180px;
+  min-width: 0;
   width: 180px;
   display: flex;
   align-items: center;
@@ -324,10 +361,23 @@
     padding: 20px 16px;
     font-size: 14px;
   }
-  .sysmsg-order-size,
   .sysmsg-order-add-btn {
     width: 100%;
     max-width: 280px;
+  }
+  /* Кнопка размера делит ряд с ценой, поэтому не растягивается на всю ширину */
+  .sysmsg-order-row {
+    gap: 12px;
+    max-width: 280px;
+  }
+  .sysmsg-order-size {
+    flex: 1 1 auto;
+    width: auto;
+    max-width: 180px;
+    padding: 12px 10px;
+  }
+  .sysmsg-order-price-value {
+    font-size: 16px;
   }
   .sysmsg-reopen {
     padding: 12px 18px;

@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from 'react';
 import { createPortal } from 'react-dom';
+import { formatPrice } from '../../../../utils/pricing';
 import './SystemMessage.css';
 
 // Окно выбора размера в стиле классического Windows.
@@ -86,8 +87,12 @@ function SizePicker({ sizes, stock, value, onSelect, onClose }) {
 // Закрывается по крестику; повторно открыть можно кнопкой-заглушкой снизу.
 // stock: { S: 3, M: 0 } — остаток по размерам; quantity — остаток товара без размеров.
 // cartQty(size) — сколько штук этого размера уже в корзине (чтобы не дать добавить больше остатка).
+// price — цена к показу (уже со скидкой), oldPrice — зачёркнутая цена до скидки, если она есть.
+// Цена стоит справа от кнопки выбора размера.
 export default function SystemMessage({
   description = '',
+  price = null,
+  oldPrice = null,
   sizes = [],
   stock = {},
   quantity = null,
@@ -146,17 +151,38 @@ export default function SystemMessage({
         {description.trim() && <p style={{ whiteSpace: 'pre-line' }}>{description}</p>}
 
         <div className="sysmsg-order">
-          {hasSizes && (
-            <button
-              type="button"
-              className="sysmsg-order-size"
-              aria-haspopup="dialog"
-              onClick={() => setPickerOpen(true)}
-            >
-              <span className="sysmsg-order-size-label">размер</span>
-              <span className="sysmsg-order-size-value">{size}</span>
-              <span className="sysmsg-order-size-arrow" aria-hidden="true">▾</span>
-            </button>
+          {(hasSizes || price != null) && (
+            <div className="sysmsg-order-row">
+              {hasSizes && (
+                <button
+                  type="button"
+                  className="sysmsg-order-size"
+                  aria-haspopup="dialog"
+                  onClick={() => setPickerOpen(true)}
+                >
+                  <span className="sysmsg-order-size-label">размер</span>
+                  <span className="sysmsg-order-size-value">{size}</span>
+                  <span className="sysmsg-order-size-arrow" aria-hidden="true">▾</span>
+                </button>
+              )}
+
+              {price != null && (
+                <div className="sysmsg-order-price">
+                  {oldPrice != null && (
+                    <span className="sysmsg-order-price-old">{formatPrice(oldPrice)}</span>
+                  )}
+                  <span
+                    className={
+                      oldPrice != null
+                        ? 'sysmsg-order-price-value sysmsg-order-price-new'
+                        : 'sysmsg-order-price-value'
+                    }
+                  >
+                    {formatPrice(price)}
+                  </span>
+                </div>
+              )}
+            </div>
           )}
 
           <button

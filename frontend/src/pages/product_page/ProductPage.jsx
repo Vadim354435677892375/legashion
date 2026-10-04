@@ -49,6 +49,13 @@ export default function ProductPage() {
     }
   };
 
+  // Цена к показу рядом с выбором размера: со скидкой, если она есть
+  const finalPrice = product
+    ? product.discountPercent
+      ? getDiscountedPrice(product.price, product.discountPercent)
+      : product.price
+    : null;
+
   const handleAddToCart = (size, buttonEl) => {
     if (!product) return;
     // Остаток этого размера (или общий — у товара без размеров) и сколько уже лежит в корзине.
@@ -114,6 +121,8 @@ export default function ProductPage() {
           <Gallery images={product?.images ?? []} />
           <SystemMessage
             description={product?.description ?? ''}
+            price={finalPrice}
+            oldPrice={product?.discountPercent ? product.price : null}
             sizes={product?.sizes ?? []}
             stock={product?.stock ?? {}}
             quantity={product?.quantity ?? null}
