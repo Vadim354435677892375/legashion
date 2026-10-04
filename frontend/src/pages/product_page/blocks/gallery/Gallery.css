@@ -23,6 +23,33 @@
   -webkit-tap-highlight-color: transparent;
 }
 
+/* Дорожка со слайдами (предыдущее / текущее / следующее): едет за пальцем при свайпе */
+.gallery-track {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  will-change: transform;
+}
+
+.gallery-slide {
+  flex: 0 0 100%;
+  height: 100%;
+  background-size: contain;
+  background-position: center;
+  background-repeat: no-repeat;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+
+.gallery-slide.is-loaded {
+  opacity: 1;
+}
+
+/* Пока фото перелистывается, блок плавно меняет высоту под пропорции следующего фото */
+.gallery-image.is-animating {
+  transition: aspect-ratio 0.3s ease;
+}
+
 .gallery-arrow {
   position: absolute;
   top: 50%;
@@ -97,12 +124,18 @@
     width: 64px;
     height: 64px;
   }
+}
 
-  .gallery-arrow.left {
-    left: -6px;
+/* В адаптиве и на сенсорных экранах фото листается пальцем — стрелки не нужны */
+@media (max-width: 640px), (hover: none) and (pointer: coarse) {
+  .gallery-arrow {
+    display: none;
   }
+}
 
-  .gallery-arrow.right {
-    right: -6px;
+@media (prefers-reduced-motion: reduce) {
+  .gallery-slide,
+  .gallery-image.is-animating {
+    transition: none;
   }
 }
