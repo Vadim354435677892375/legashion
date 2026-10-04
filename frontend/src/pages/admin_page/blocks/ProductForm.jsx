@@ -18,6 +18,9 @@ const EMPTY = {
   widthCm: '',
   heightCm: '',
   sizes: [...DEFAULT_SIZES],
+  // остаток: по размерам { S: '5' } (строки — значения инпутов) и общее количество для товара без размеров
+  stock: {},
+  quantity: '0',
   collectionSlugs: [],
   imageUrls: [],
 };
@@ -36,6 +39,10 @@ function toFormState(product) {
     widthCm: product.widthCm == null ? '' : String(product.widthCm),
     heightCm: product.heightCm == null ? '' : String(product.heightCm),
     sizes: [...(product.sizes ?? [])],
+    stock: Object.fromEntries(
+      Object.entries(product.stock ?? {}).map(([size, qty]) => [size, String(qty)])
+    ),
+    quantity: String(product.quantity ?? 0),
     collectionSlugs: [...product.collectionSlugs],
     imageUrls: product.images.map((img) => img.url),
   };
@@ -131,6 +138,11 @@ export default function ProductForm({ product, collections, onCancel, onSaved })
       widthCm: form.widthCm === '' ? null : Number(form.widthCm),
       heightCm: form.heightCm === '' ? null : Number(form.heightCm),
       sizes: form.sizes,
+      // пустое поле = 0; лишние размеры (сняли галочку) бэкенд отбросит сам
+      stock: Object.fromEntries(
+        form.sizes.map((size) => [size, Math.max(0, Math.floor(Number(form.stock[size])) || 0)])
+      ),
+      quantity: Math.max(0, Math.floor(Number(form.quantity)) || 0),
       collectionSlugs: form.collectionSlugs,
       imageUrls: form.imageUrls,
     };
@@ -303,6 +315,44 @@ export default function ProductForm({ product, collections, onCancel, onSaved })
               </label>
             ))}
           </div>
+
+          {form.sizes.length > 0 ? (
+            <>
+              <p className="admin-muted">
+                Сколько штук в наличии по каждому размеру. 0 — размера нет в наличии, покупатель
+                его не сможет заказать. Остаток уменьшается при заказе и возвращается при отмене.
+              </p>
+              <div className="admin-form-row">
+                {AVAILABLE_SIZES.filter((size) => form.sizes.includes(size)).map((size) => (
+                  <label key={size}>
+                    {size}, шт.
+                    <input
+                      type="number"
+                      min="0"
+                      max="100000"
+                      step="1"
+                      value={form.stock[size] ?? '0'}
+                      onChange={(e) =>
+                        update({ stock: { ...form.stock, [size]: e.target.value } })
+                      }
+                    />
+                  </label>
+                ))}
+              </div>
+            </>
+          ) : (
+            <label>
+              Количество в наличии, шт.
+              <input
+                type="number"
+                min="0"
+                max="100000"
+                step="1"
+                value={form.quantity}
+                onChange={(e) => update({ quantity: e.target.value })}
+              />
+            </label>
+          )}
         </fieldset>
 
         <fieldset className="admin-fieldset">

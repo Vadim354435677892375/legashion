@@ -334,3 +334,49 @@
     font-size: 13px;
   }
 }
+
+/* Остаток под выбранным размером и недоступные размеры */
+.sysmsg-stock {
+  margin: 0;
+  font-family: var(--font-main);
+  font-size: 13px;
+  color: #3a3a3a;
+}
+
+.sysmsg-stock.is-out {
+  color: #b3261e;
+}
+
+.sysmsg-order-add-btn:disabled {
+  cursor: not-allowed;
+  opacity: 0.55;
+  transform: none;
+  box-shadow: 0 0 0 1px #274fc9 inset;
+  filter: grayscale(0.6);
+}
+
+.sizepicker-tile {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 2px;
+}
+
+.sizepicker-tile-left {
+  font-size: 11px;
+  font-weight: 400;
+  opacity: 0.75;
+}
+
+.sizepicker-tile.is-soldout,
+.sizepicker-tile:disabled {
+  cursor: not-allowed;
+  opacity: 0.45;
+  background: #bdbdbd;
+  text-decoration: line-through;
+}
+
+.sizepicker-tile:disabled:hover {
+  transform: none;
+}

@@ -5,6 +5,7 @@ import { asyncHandler } from '../middleware/asyncHandler.js';
 import { HttpError } from '../middleware/errorHandler.js';
 import { createOrderSchema } from '../schemas/order.js';
 import { priceOrderItems, resolvePromo } from '../lib/orderPricing.js';
+import { reserveStock } from '../lib/stock.js';
 import { notifyTelegramNewOrder } from '../lib/telegram.js';
 import { notifyEmailNewOrder } from '../lib/email.js';
 
@@ -36,6 +37,9 @@ ordersRouter.post(
     // Создание заказа и увеличение счётчика использований промокода — одной транзакцией,
     // чтобы при гонке двух заказов с одним кодом usedCount не разъехался с реальным числом заказов.
     const order = await prisma.$transaction(async (tx) => {
+      // Сначала списываем остаток: если не хватает — 409, и заказ не создаётся.
+      await reserveStock(tx, items);
+
       const created = await tx.order.create({
         data: {
           orderNumber: generateOrderNumber(),

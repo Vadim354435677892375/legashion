@@ -3,12 +3,14 @@ import { prisma } from '../../lib/prisma.js';
 import { asyncHandler } from '../../middleware/asyncHandler.js';
 import { HttpError } from '../../middleware/errorHandler.js';
 import { upsertProductSchema } from '../../schemas/product.js';
+import { buildStockRows, serializeStock } from '../../lib/stock.js';
 
 export const adminProductsRouter = Router();
 
 const productInclude = {
   images: { orderBy: { position: 'asc' } },
   collections: { include: { collection: true } },
+  stock: true,
 };
 
 function serializeProduct(product) {
@@ -24,6 +26,7 @@ function serializeProduct(product) {
     lengthCm: product.lengthCm,
     widthCm: product.widthCm,
     heightCm: product.heightCm,
+    ...serializeStock(product),
     images: product.images.map((img) => ({ id: img.id, url: img.url })),
     collectionSlugs: product.collections.map((pc) => pc.collection.slug),
     createdAt: product.createdAt,
@@ -56,7 +59,11 @@ adminProductsRouter.get(
 
 // Общая логика для create/update: связывает товар с коллекциями по slug'ам
 // (создавая коллекцию на лету, если админ ввёл новый slug) и пересоздаёт список фото.
-async function syncCollectionsAndImages(tx, productId, { collectionSlugs, imageUrls }) {
+async function syncCollectionsAndImages(
+  tx,
+  productId,
+  { collectionSlugs, imageUrls, sizes, stock, quantity }
+) {
   const collections = await Promise.all(
     collectionSlugs.map((slug) =>
       tx.collection.upsert({
@@ -73,6 +80,12 @@ async function syncCollectionsAndImages(tx, productId, { collectionSlugs, imageU
       data: collections.map((c) => ({ productId, collectionId: c.id })),
     });
   }
+
+  // Остатки по размерам: оставляем только строки для размеров товара и записываем введённые числа.
+  await tx.productStock.deleteMany({ where: { productId } });
+  await tx.productStock.createMany({
+    data: buildStockRows(sizes, stock, quantity).map((row) => ({ productId, ...row })),
+  });
 
   await tx.productImage.deleteMany({ where: { productId } });
   if (imageUrls.length > 0) {

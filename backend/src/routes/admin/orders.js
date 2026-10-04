@@ -3,6 +3,7 @@ import { z } from 'zod';
 import { prisma } from '../../lib/prisma.js';
 import { asyncHandler } from '../../middleware/asyncHandler.js';
 import { HttpError } from '../../middleware/errorHandler.js';
+import { releaseStock, reserveStock } from '../../lib/stock.js';
 
 export const adminOrdersRouter = Router();
 
@@ -43,10 +44,19 @@ adminOrdersRouter.patch(
     const id = Number(req.params.id);
     const { status } = statusSchema.parse(req.body);
 
-    const exists = await prisma.order.findUnique({ where: { id } });
+    const exists = await prisma.order.findUnique({ where: { id }, include: { items: true } });
     if (!exists) throw new HttpError(404, 'Заказ не найден');
 
-    const order = await prisma.order.update({ where: { id }, data: { status } });
+    // Остаток привязан к отмене: отменили — вернули на склад, вернули заказ в работу — снова
+    // списали (если за это время товар разобрали, вернётся 409 и статус не изменится).
+    const order = await prisma.$transaction(async (tx) => {
+      if (exists.status !== 'CANCELLED' && status === 'CANCELLED') {
+        await releaseStock(tx, exists.items);
+      } else if (exists.status === 'CANCELLED' && status !== 'CANCELLED') {
+        await reserveStock(tx, exists.items);
+      }
+      return tx.order.update({ where: { id }, data: { status } });
+    });
     res.json(order);
   })
 );

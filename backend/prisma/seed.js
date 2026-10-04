@@ -83,6 +83,7 @@ async function main() {
         name: p.name,
         price: p.price,
         discountPercent: p.discountPercent,
+        // Остатки заполняются в админке; пока строк нет, размеры считаются «нет в наличии».
         collections: {
           create: p.collectionSlugs.map((slug) => ({ collectionId: collectionBySlug[slug].id })),
         },

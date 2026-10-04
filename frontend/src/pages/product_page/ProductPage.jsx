@@ -15,7 +15,7 @@ import SystemMessage from './blocks/system-message/SystemMessage';
 // коллекции на него ни перешли.
 export default function ProductPage() {
   const { id } = useParams();
-  const { addItem, totalCount } = useCart();
+  const { items: cartItems, addItem, totalCount } = useCart();
   const navigate = useNavigate();
 
   // Товар берётся из общего кэша: если его уже открывали, страница показывается мгновенно
@@ -51,6 +51,10 @@ export default function ProductPage() {
 
   const handleAddToCart = (size, buttonEl) => {
     if (!product) return;
+    // Остаток этого размера (или общий — у товара без размеров) и сколько уже лежит в корзине.
+    const available = size ? (product.stock?.[size] ?? 0) : (product.quantity ?? 0);
+    const inCart = cartItems.find((i) => i.id === `${product.id}-${size}`)?.qty ?? 0;
+    if (inCart >= available) return;
     const finalPrice = product.discountPercent
       ? getDiscountedPrice(product.price, product.discountPercent)
       : product.price;
@@ -64,6 +68,7 @@ export default function ProductPage() {
       price: finalPrice,
       discount: product.discountPercent || undefined,
       qty: 1,
+      maxQty: available,
     });
 
     // Точка полёта: место, где появляется красный кружок (правый верхний угол ссылки)
@@ -110,6 +115,9 @@ export default function ProductPage() {
           <SystemMessage
             description={product?.description ?? ''}
             sizes={product?.sizes ?? []}
+            stock={product?.stock ?? {}}
+            quantity={product?.quantity ?? null}
+            cartQty={(size) => cartItems.find((i) => i.id === `${product?.id}-${size}`)?.qty ?? 0}
             onAddToCart={handleAddToCart}
           />
         </>

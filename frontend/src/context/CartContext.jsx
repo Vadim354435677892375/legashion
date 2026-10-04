@@ -1,7 +1,9 @@
 import { createContext, useCallback, useContext, useMemo, useState } from 'react';
 
 // Общий контекст корзины.
-// item: { id, productId, name, image, size, price, qty }
+// item: { id, productId, name, image, size, price, qty, maxQty }
+// maxQty — сколько штук этого размера было в наличии при добавлении (null/нет — без ограничения);
+// это лишь удобство для покупателя, реальный остаток всё равно проверяет бэкенд при заказе.
 // price здесь — только для показа в корзине; при оформлении заказа бэкенд берёт цену из БД по productId.
 // id должен быть уникальным для пары товар+размер (иначе один и тот же товар
 // в разных размерах затрёт друг друга).
@@ -13,12 +15,16 @@ export function CartProvider({ children }) {
   const addItem = useCallback((product) => {
     setItems((prev) => {
       const existing = prev.find((i) => i.id === product.id);
+      const clamp = (qty, max) => (max == null ? qty : Math.min(qty, max));
       if (existing) {
+        const maxQty = product.maxQty ?? existing.maxQty;
         return prev.map((i) =>
-          i.id === product.id ? { ...i, qty: i.qty + (product.qty ?? 1) } : i
+          i.id === product.id
+            ? { ...i, maxQty, qty: clamp(i.qty + (product.qty ?? 1), maxQty) }
+            : i
         );
       }
-      return [...prev, { qty: 1, ...product }];
+      return [...prev, { ...product, qty: clamp(product.qty ?? 1, product.maxQty) }];
     });
   }, []);
 
@@ -28,7 +34,11 @@ export function CartProvider({ children }) {
 
   const updateQty = useCallback((id, qty) => {
     setItems((prev) =>
-      prev.map((i) => (i.id === id ? { ...i, qty: Math.max(1, qty) } : i))
+      prev.map((i) =>
+        i.id === id
+          ? { ...i, qty: Math.min(Math.max(1, qty), i.maxQty ?? Infinity) }
+          : i
+      )
     );
   }, []);
 

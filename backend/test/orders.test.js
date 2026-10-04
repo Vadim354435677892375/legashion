@@ -10,13 +10,17 @@ after(() => ctx.close());
 
 beforeEach(() => {
   ctx.prisma._db.orders = [];
-  const dims = { weightGrams: 500, lengthCm: 30, widthCm: 25, heightCm: 5 };
+  const dims = { weightGrams: 500, lengthCm: 30, widthCm: 25, heightCm: 5, sizes: ['S', 'M', 'L', 'XL'] };
   ctx.prisma._db.products = [
     { id: 1, name: 'T-shirt "Eminem"', price: 1800, discountPercent: 0, isActive: true, ...dims },
     { id: 2, name: 'T-shirt "Sale"', price: 1800, discountPercent: 20, isActive: true, ...dims },
     { id: 3, name: 'Скрытый товар', price: 1000, discountPercent: 0, isActive: false, ...dims },
-    { id: 4, name: 'Без габаритов', price: 1000, discountPercent: 0, isActive: true, weightGrams: 500, lengthCm: null, widthCm: 25, heightCm: 5 },
+    { id: 4, name: 'Без габаритов', price: 1000, discountPercent: 0, isActive: true, sizes: ['S', 'M', 'L', 'XL'], weightGrams: 500, lengthCm: null, widthCm: 25, heightCm: 5 },
   ];
+  // Остатки: у товаров 1 и 2 по 10 штук в размерах S/M/L/XL, у товара 4 тоже есть.
+  ctx.prisma._db.stock = [1, 2, 4].flatMap((productId) =>
+    ['S', 'M', 'L', 'XL'].map((size) => ({ productId, size, quantity: 10 }))
+  );
 });
 
 const baseOrder = (items) => ({
@@ -94,6 +98,70 @@ describe('POST /api/orders — цены считает сервер', () => {
   it('слишком много позиций → 400', async () => {
     const items = Array.from({ length: 31 }, () => ({ productId: 1, size: 'M', qty: 1 }));
     assert.equal((await send(baseOrder(items))).status, 400);
+  });
+});
+
+describe('POST /api/orders — остатки по размерам', () => {
+  const qtyOf = (productId, size) =>
+    ctx.prisma._db.stock.find((r) => r.productId === productId && r.size === size).quantity;
+
+  it('после заказа списывает остаток нужного размера', async () => {
+    const res = await send(baseOrder([{ productId: 1, size: 'M', qty: 3 }]));
+    assert.equal(res.status, 201);
+    assert.equal(qtyOf(1, 'M'), 7);
+    assert.equal(qtyOf(1, 'L'), 10, 'другие размеры не трогаем');
+  });
+
+  it('можно купить ровно весь остаток', async () => {
+    ctx.prisma._db.stock.find((r) => r.productId === 1 && r.size === 'S').quantity = 2;
+    const res = await send(baseOrder([{ productId: 1, size: 'S', qty: 2 }]));
+    assert.equal(res.status, 201);
+    assert.equal(qtyOf(1, 'S'), 0);
+  });
+
+  it('больше остатка → 409 с понятным текстом, заказ не создаётся', async () => {
+    ctx.prisma._db.stock.find((r) => r.productId === 1 && r.size === 'S').quantity = 2;
+    const res = await send(baseOrder([{ productId: 1, size: 'S', qty: 3 }]));
+    assert.equal(res.status, 409);
+    assert.match((await res.json()).error, /в наличии только 2 шт/);
+    assert.equal(ctx.prisma._db.orders.length, 0);
+    assert.equal(qtyOf(1, 'S'), 2);
+  });
+
+  it('размер, которого нет в наличии (0 или нет строки) → 409', async () => {
+    ctx.prisma._db.stock.find((r) => r.productId === 1 && r.size === 'S').quantity = 0;
+    const soldOut = await send(baseOrder([{ productId: 1, size: 'S', qty: 1 }]));
+    assert.equal(soldOut.status, 409);
+    assert.match((await soldOut.json()).error, /нет в наличии/);
+
+    ctx.prisma._db.stock = [];
+    const noRow = await send(baseOrder([{ productId: 1, size: 'M', qty: 1 }]));
+    assert.equal(noRow.status, 409);
+  });
+
+  it('всё или ничего: если на вторую позицию не хватает, первая не списывается', async () => {
+    ctx.prisma._db.stock.find((r) => r.productId === 2 && r.size === 'L').quantity = 1;
+    const res = await send(
+      baseOrder([
+        { productId: 1, size: 'M', qty: 2 },
+        { productId: 2, size: 'L', qty: 5 },
+      ])
+    );
+    assert.equal(res.status, 409);
+    assert.equal(qtyOf(1, 'M'), 10);
+    assert.equal(ctx.prisma._db.orders.length, 0);
+  });
+
+  it('одинаковая пара товар+размер в двух позициях суммируется', async () => {
+    ctx.prisma._db.stock.find((r) => r.productId === 1 && r.size === 'M').quantity = 3;
+    const res = await send(
+      baseOrder([
+        { productId: 1, size: 'M', qty: 2 },
+        { productId: 1, size: 'M', qty: 2 },
+      ])
+    );
+    assert.equal(res.status, 409, '2 + 2 больше остатка 3');
+    assert.equal(qtyOf(1, 'M'), 3);
   });
 });
 

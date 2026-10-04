@@ -7,7 +7,8 @@ import './SystemMessage.css';
 // показываем своё окно с крупными кнопками-плитками — удобно нажимать пальцем.
 // Рендерится через портал в <body>, чтобы `overflow: hidden` родителя его не обрезал.
 // sizes — размеры конкретного товара (product.sizes с бэкенда), а не фиксированный список.
-function SizePicker({ sizes, value, onSelect, onClose }) {
+// stock — { S: 3, M: 0 }: под каждой плиткой пишем, сколько штук осталось; размер с 0 недоступен.
+function SizePicker({ sizes, stock, value, onSelect, onClose }) {
   const activeRef = useRef(null);
 
   useEffect(() => {
@@ -45,19 +46,24 @@ function SizePicker({ sizes, value, onSelect, onClose }) {
         </div>
         <div className="sizepicker-body">
           <div className="sizepicker-grid" role="radiogroup" aria-label="Размер">
-            {sizes.map((s) => (
-              <button
-                key={s}
-                type="button"
-                role="radio"
-                aria-checked={s === value}
-                ref={s === value ? activeRef : null}
-                className={`sizepicker-tile${s === value ? ' is-active' : ''}`}
-                onClick={() => onSelect(s)}
-              >
-                {s}
-              </button>
-            ))}
+            {sizes.map((s) => {
+              const left = stock[s] ?? 0;
+              return (
+                <button
+                  key={s}
+                  type="button"
+                  role="radio"
+                  aria-checked={s === value}
+                  ref={s === value ? activeRef : null}
+                  className={`sizepicker-tile${s === value ? ' is-active' : ''}${left === 0 ? ' is-soldout' : ''}`}
+                  disabled={left === 0}
+                  onClick={() => onSelect(s)}
+                >
+                  <span className="sizepicker-tile-size">{s}</span>
+                  <span className="sizepicker-tile-left">{left === 0 ? 'нет' : `${left} шт.`}</span>
+                </button>
+              );
+            })}
           </div>
           <button type="button" className="sizepicker-cancel" onClick={onClose}>
             отмена
@@ -78,7 +84,16 @@ function SizePicker({ sizes, value, onSelect, onClose }) {
 // выбранный размер и сама кнопка (откуда стартует анимация полёта в корзину).
 // Выбор размера и кнопка «в корзину» находятся внутри этого же окна.
 // Закрывается по крестику; повторно открыть можно кнопкой-заглушкой снизу.
-export default function SystemMessage({ description = '', sizes = [], onAddToCart }) {
+// stock: { S: 3, M: 0 } — остаток по размерам; quantity — остаток товара без размеров.
+// cartQty(size) — сколько штук этого размера уже в корзине (чтобы не дать добавить больше остатка).
+export default function SystemMessage({
+  description = '',
+  sizes = [],
+  stock = {},
+  quantity = null,
+  cartQty = () => 0,
+  onAddToCart,
+}) {
   const [closed, setClosed] = useState(false);
   const [size, setSize] = useState(sizes[0] ?? null);
   const [pickerOpen, setPickerOpen] = useState(false);
@@ -87,13 +102,24 @@ export default function SystemMessage({ description = '', sizes = [], onAddToCar
   // Товар загружается асинхронно (GET /api/products/:id) — в момент первого рендера
   // sizes ещё пустой массив. Как только список размеров приходит, выставляем первый
   // по умолчанию; если он уже выбран (например, при повторном рендере) — не трогаем.
+  // По умолчанию выбираем первый размер, который есть в наличии (иначе — первый вообще).
   useEffect(() => {
     if (sizes.length === 0) {
       setSize(null);
     } else {
-      setSize((prev) => (prev && sizes.includes(prev) ? prev : sizes[0]));
+      setSize((prev) => {
+        if (prev && sizes.includes(prev) && (stock[prev] ?? 0) > 0) return prev;
+        return sizes.find((s) => (stock[s] ?? 0) > 0) ?? sizes[0];
+      });
     }
-  }, [sizes]);
+  }, [sizes, stock]);
+
+  // Сколько осталось именно для выбранного варианта и сколько ещё можно положить в корзину.
+  const available = hasSizes ? (stock[size] ?? 0) : (quantity ?? 0);
+  const canAdd = available - cartQty(size) > 0;
+  const allSoldOut = hasSizes
+    ? sizes.every((s) => (stock[s] ?? 0) === 0)
+    : (quantity ?? 0) === 0;
 
   if (closed) {
     return (
@@ -133,12 +159,23 @@ export default function SystemMessage({ description = '', sizes = [], onAddToCar
             </button>
           )}
 
+          <p className={`sysmsg-stock${available === 0 ? ' is-out' : ''}`}>
+            {available === 0 ? 'нет в наличии' : `в наличии: ${available} шт.`}
+          </p>
+
           <button
             type="button"
             className="sysmsg-order-add-btn"
+            disabled={!canAdd}
             onClick={(e) => onAddToCart?.(size, e.currentTarget)}
           >
-            в корзину
+            {allSoldOut
+              ? 'нет в наличии'
+              : available === 0
+                ? 'выберите другой размер'
+                : canAdd
+                  ? 'в корзину'
+                  : 'всё уже в корзине'}
           </button>
         </div>
       </div>
@@ -146,6 +183,7 @@ export default function SystemMessage({ description = '', sizes = [], onAddToCar
       {pickerOpen && hasSizes && (
         <SizePicker
           sizes={sizes}
+          stock={stock}
           value={size}
           onClose={() => setPickerOpen(false)}
           onSelect={(s) => {

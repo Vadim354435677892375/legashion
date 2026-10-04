@@ -9,6 +9,7 @@ export function createFakePrisma() {
     siteMedia: [],
     tracks: [],
     collections: [],
+    stock: [], // строки ProductStock: { productId, size, quantity }
     nextId: 1,
   };
   const id = () => db.nextId++;
@@ -150,9 +151,39 @@ export function createFakePrisma() {
       },
     },
 
+    // Остатки по размерам. where: { productId, size, quantity?: { gte } }; data.quantity: { decrement | increment }.
+    productStock: {
+      findFirst: async ({ where }) =>
+        db.stock.find((r) => r.productId === where.productId && r.size === where.size) ?? null,
+      updateMany: async ({ where, data }) => {
+        const rows = db.stock.filter(
+          (r) =>
+            r.productId === where.productId &&
+            r.size === where.size &&
+            (where.quantity?.gte === undefined || r.quantity >= where.quantity.gte)
+        );
+        for (const r of rows) {
+          if (data.quantity?.decrement) r.quantity -= data.quantity.decrement;
+          if (data.quantity?.increment) r.quantity += data.quantity.increment;
+        }
+        return { count: rows.length };
+      },
+    },
+
     // Два вида вызова: массив уже запущенных операций (достаточно дождаться их всех)
     // и интерактивная транзакция — функция, которой отдаём тот же fake-клиент.
-    $transaction: async (arg) => (typeof arg === 'function' ? arg(fake) : Promise.all(arg)),
+    // Как настоящая транзакция, откатывает остатки и заказы, если функция бросила ошибку.
+    $transaction: async (arg) => {
+      if (typeof arg !== 'function') return Promise.all(arg);
+      const snapshot = structuredClone({ stock: db.stock, orders: db.orders });
+      try {
+        return await arg(fake);
+      } catch (err) {
+        db.stock = snapshot.stock;
+        db.orders = snapshot.orders;
+        throw err;
+      }
+    },
   };
   return fake;
 }

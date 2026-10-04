@@ -121,7 +121,9 @@ export default function ProductsTab() {
               </p>
 
               <p className="admin-card-meta">
-                {product.sizes?.length > 0 ? `Размеры: ${product.sizes.join(', ')}` : 'Без размеров'}
+                {product.sizes?.length > 0
+                  ? `Наличие: ${product.sizes.map((s) => `${s} — ${product.stock?.[s] ?? 0}`).join(', ')}`
+                  : `Без размеров, в наличии: ${product.quantity ?? 0}`}
               </p>
 
               {(product.weightGrams == null ||

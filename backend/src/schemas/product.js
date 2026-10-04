@@ -25,6 +25,12 @@ export const upsertProductSchema = z.object({
     .array(z.enum(AVAILABLE_SIZES, { message: `Размер должен быть одним из: ${AVAILABLE_SIZES.join(', ')}` }))
     .default(DEFAULT_SIZES)
     .transform(normalizeSizes),
+  // остаток по размерам: { S: 3, M: 0 }. Размеры, которых нет в `sizes`, игнорируются;
+  // не указанный размер = 0 (нет в наличии). Для товара без размеров — `quantity`.
+  stock: z
+    .record(z.string(), z.number().int().min(0, 'Количество не может быть отрицательным').max(100000))
+    .default({}),
+  quantity: z.number().int().min(0, 'Количество не может быть отрицательным').max(100000).default(0),
   // slugs существующих коллекций (home/sale/archive/tshirts/new-collection/...)
   collectionSlugs: z.array(z.string().trim().min(1)).default([]),
   // порядок картинок задаётся порядком в массиве

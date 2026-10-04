@@ -108,6 +108,20 @@ model Product {
   images          ProductImage[]
   collections     ProductCollection[]
   orderItems      OrderItem[]
+  stock           ProductStock[]
+}
+
+// Остаток товара по размерам. size = '' (пустая строка) — товар без размеров (аксессуары):
+// у него одна строка с общим количеством. Нет строки для размера — считаем, что его нет в наличии.
+// При заказе количество уменьшается атомарно (lib/stock.js), при отмене заказа возвращается.
+model ProductStock {
+  id        Int     @id @default(autoincrement())
+  productId Int
+  product   Product @relation(fields: [productId], references: [id], onDelete: Cascade)
+  size      String // 'S' | 'M' | ... | '' (без размера)
+  quantity  Int     @default(0)
+
+  @@unique([productId, size])
 }
 
 model ProductImage {

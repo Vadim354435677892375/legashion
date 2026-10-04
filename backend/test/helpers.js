@@ -28,6 +28,7 @@ export async function loadApp({ env = {}, cacheKey = 'default' } = {}) {
     siteMedia: [],
     tracks: [],
     collections: [],
+    stock: [],
   });
 
   // Query-строка нужна, чтобы app.js перечитал process.env (NODE_ENV, CORS_ORIGIN) заново.

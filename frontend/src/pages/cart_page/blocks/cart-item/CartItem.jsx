@@ -5,7 +5,7 @@ function formatPrice(value) {
 }
 
 // Строка товара в корзине.
-// item: { id, name, image, size, price, qty }
+// item: { id, name, image, size, price, qty, maxQty }
 // onQtyChange(id, qty), onRemove(id)
 export default function CartItem({ item, onQtyChange, onRemove }) {
   const decrease = () => onQtyChange(item.id, item.qty - 1);
@@ -49,6 +49,8 @@ export default function CartItem({ item, onQtyChange, onRemove }) {
           type="button"
           className="cart-item-qty-btn"
           onClick={increase}
+          disabled={item.maxQty != null && item.qty >= item.maxQty}
+          title={item.maxQty != null && item.qty >= item.maxQty ? `В наличии только ${item.maxQty} шт.` : undefined}
           aria-label="Увеличить количество"
         >
           +
