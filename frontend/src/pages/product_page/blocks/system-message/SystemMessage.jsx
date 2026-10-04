@@ -147,19 +147,16 @@ export default function SystemMessage({
 
         <div className="sysmsg-order">
           {hasSizes && (
-            <div className="sysmsg-order-sizerow">
-              <button
-                type="button"
-                className="sysmsg-order-size"
-                aria-haspopup="dialog"
-                aria-label={`Размер: ${size}. Выбрать другой`}
-                onClick={() => setPickerOpen(true)}
-              >
-                <span className="sysmsg-order-size-value">{size}</span>
-                <span className="sysmsg-order-size-arrow" aria-hidden="true">▾</span>
-              </button>
+            <button
+              type="button"
+              className="sysmsg-order-size"
+              aria-haspopup="dialog"
+              onClick={() => setPickerOpen(true)}
+            >
               <span className="sysmsg-order-size-label">размер</span>
-            </div>
+              <span className="sysmsg-order-size-value">{size}</span>
+              <span className="sysmsg-order-size-arrow" aria-hidden="true">▾</span>
+            </button>
           )}
 
           <button

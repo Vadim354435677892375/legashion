@@ -68,17 +68,9 @@
   gap: 14px;
 }
 
-/* Ряд: кнопка с выбранным размером, правее неё — слово «размер» */
-.sysmsg-order-sizerow {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 12px;
-}
-
 /* Кнопка, показывающая выбранный размер и открывающая окно выбора */
 .sysmsg-order-size {
-  width: 120px;
+  width: 180px;
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -332,6 +324,7 @@
     padding: 20px 16px;
     font-size: 14px;
   }
+  .sysmsg-order-size,
   .sysmsg-order-add-btn {
     width: 100%;
     max-width: 280px;
@@ -373,27 +366,6 @@
   color: #1a1a1a;
   border-color: #0a0a0a;
   box-shadow: inset 0 1px 0 #fff;
-}
-
-/* Размер, которого нет, перечёркнут ровной горизонтальной линией по центру букв.
-   (text-decoration в пиксельном шрифте рисуется тонко и неровно, поэтому линия — своим элементом.)
-   Подпись «нет» не перечёркиваем. */
-.sizepicker-tile-size {
-  position: relative;
-  display: inline-block;
-  line-height: 1;
-}
-
-.sizepicker-tile.is-soldout .sizepicker-tile-size::after {
-  content: '';
-  position: absolute;
-  left: -5px;
-  right: -5px;
-  top: 50%;
-  height: 3px;
-  margin-top: -1px;
-  background: #1a1a1a;
-  pointer-events: none;
 }
 
 .sizepicker-tile:disabled:hover {
